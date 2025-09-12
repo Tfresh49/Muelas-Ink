@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { Story } from '@/lib/types';
 import Image from 'next/image';
 import CommentSection from '@/components/comment-section';
@@ -32,15 +32,15 @@ export default function StoryView({ story }: StoryViewProps) {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <article>
                 <header className="mb-8">
-                    <h1 className="font-headline text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
-                        {story.title}
-                    </h1>
-                    <div className="flex gap-2 mt-4">
+                     <div className="flex gap-2 mb-4">
                         <Badge variant="outline" className="border-accent text-accent">{story.category}</Badge>
                         {story.tags.map(tag => (
                             <Badge key={tag} variant="secondary">{tag}</Badge>
                         ))}
                     </div>
+                    <h1 className="font-headline text-4xl md:text-5xl font-extrabold mb-2 leading-tight">
+                        {story.title}
+                    </h1>
                 </header>
 
                 <Carousel

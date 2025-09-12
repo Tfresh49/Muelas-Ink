@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Star, Eye, Heart } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface StoryCardProps {
   story: Story;
@@ -30,13 +31,32 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 export default function StoryCard({ story }: StoryCardProps) {
+  const [currentImage, setCurrentImage] = useState(story.imageUrl);
+  
+  // This is a mock for multiple images. In a real scenario, story would have an array of images.
+  const images = [
+      story.imageUrl,
+      `https://picsum.photos/seed/${story.id.length + 10}/600/400`,
+      `https://picsum.photos/seed/${story.id.length + 20}/600/400`,
+  ];
+
+  useEffect(() => {
+    let imageIndex = 0;
+    const interval = setInterval(() => {
+        imageIndex = (imageIndex + 1) % images.length;
+        setCurrentImage(images[imageIndex]);
+    }, 2000 + Math.random() * 6000);
+
+    return () => clearInterval(interval);
+  }, [images]);
+
   return (
     <Link href={`/stories/${story.id}`} className="group block">
-      <Card className="h-full overflow-hidden transition-all group-hover:shadow-lg group-hover:border-accent flex flex-col">
+      <Card className="h-full overflow-hidden transition-all group-hover:shadow-lg group-hover:border-primary flex flex-col">
         <CardHeader className="p-0">
           <div className="relative h-48 w-full">
             <Image
-              src={story.imageUrl}
+              src={currentImage}
               alt={story.title}
               fill
               className="object-cover transition-transform group-hover:scale-105"
@@ -64,7 +84,7 @@ export default function StoryCard({ story }: StoryCardProps) {
                     <span>{story.likes.toLocaleString()}</span>
                 </div>
              </div>
-            <Badge variant="outline" className="border-accent text-accent">{story.category}</Badge>
+            <Badge variant="outline" className="border-primary text-primary">{story.category}</Badge>
           </div>
         </CardFooter>
       </Card>

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { allStories } from '@/lib/data';
-import type { Story } from '@/lib/types';
 import StoryCard from '@/components/story-card';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
@@ -13,32 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import AIRecommendations from '@/components/ai-recommendations';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const allCategories = ['All', ...Array.from(new Set(allStories.map(story => story.category)))];
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [searchHistory, setSearchHistory] = useState<string[]>([]);
-
-  useEffect(() => {
-    const storedHistory = localStorage.getItem('searchHistory');
-    if (storedHistory) {
-      setSearchHistory(JSON.parse(storedHistory));
-    }
-  }, []);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-  
-  const handleSearchSubmit = () => {
-    if(searchQuery.trim() === '') return;
-    const updatedHistory = [...searchHistory, searchQuery];
-    setSearchHistory(updatedHistory);
-    localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
-  }
 
   const filteredStories = useMemo(() => {
     return allStories.filter(story => {
@@ -50,51 +31,67 @@ export default function Home() {
   }, [searchQuery, selectedCategory]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-12">
-        <h1 className="font-headline text-5xl md:text-6xl font-bold mb-4">Discover Your Next Favorite Story</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Browse our collection of tales, from epic fantasies to thrilling space operas.
-        </p>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-4 mb-8 justify-center">
-        <div className="relative w-full md:max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search stories..."
-            className="pl-10 h-12"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
-          />
+    <div>
+      <section className="py-16 md:py-24 text-center bg-secondary">
+        <div className="container">
+          <h1 className="font-headline text-4xl md:text-6xl font-bold mb-4">
+            This is a demo stories sharing site
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+            So this is what the website might look like to your readers
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button asChild size="lg">
+              <Link href="#stories">Start Reading</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+               <Link href="#stories">Browse Categories</Link>
+            </Button>
+          </div>
         </div>
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full md:w-[180px] h-12">
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            {allCategories.map(category => (
-              <SelectItem key={category} value={category}>{category}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      </section>
 
-      <AIRecommendations />
+      <section id="stories" className="py-16 md:py-24">
+        <div className="container">
+          <h2 className="font-headline text-3xl md:text-4xl font-bold mb-2">Featured Stories</h2>
+          <p className="text-muted-foreground mb-8">Check out some of our most popular stories from talented writers around the world.</p>
 
-      {filteredStories.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredStories.map(story => (
-            <StoryCard key={story.id} story={story} />
-          ))}
+          <div className="flex flex-col md:flex-row gap-4 mb-8 justify-center">
+            <div className="relative w-full md:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search stories..."
+                className="pl-10 h-12"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full md:w-[180px] h-12">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {allCategories.map(category => (
+                  <SelectItem key={category} value={category}>{category}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {filteredStories.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredStories.map(story => (
+                <StoryCard key={story.id} story={story} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-xl text-muted-foreground">No stories found. Try a different search or category.</p>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="text-center py-16">
-          <p className="text-xl text-muted-foreground">No stories found. Try a different search or category.</p>
-        </div>
-      )}
+      </section>
     </div>
   );
 }
