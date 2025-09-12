@@ -1,82 +1,29 @@
 
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useMemo } from 'react';
 import { allStories } from '@/lib/data';
 import StoryCard from '@/components/story-card';
-import { Input } from '@/components/ui/input';
-import { Search, Loader2 } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-
-const allCategories = ['All', ...Array.from(new Set(allStories.map(story => story.category)))];
-const STORIES_PER_PAGE = 3;
+import { ArrowRight } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [visibleStoriesCount, setVisibleStoriesCount] = useState(STORIES_PER_PAGE);
-  const [isLoading, setIsLoading] = useState(false);
-  const loaderRef = useRef(null);
+  const featuredStories = useMemo(() => {
+    // Example logic: feature stories with high ratings
+    return [...allStories].sort((a, b) => b.rating - a.rating).slice(0, 5);
+  }, []);
 
-  const filteredStories = useMemo(() => {
-    return allStories.filter(story => {
-      const matchesCategory = selectedCategory === 'All' || story.category === selectedCategory;
-      const matchesSearch = story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            story.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    });
-  }, [searchQuery, selectedCategory]);
+  const latestStories = useMemo(() => {
+    // Example logic: slice the last 6 stories, assuming they are sorted by date (which they are not in mock data)
+    return allStories.slice(-6).reverse();
+  }, []);
 
-  const storiesToShow = useMemo(() => {
-    return filteredStories.slice(0, visibleStoriesCount);
-  }, [filteredStories, visibleStoriesCount]);
-
-  const allStoriesLoaded = visibleStoriesCount >= filteredStories.length;
-
-  const loadMoreStories = useCallback(() => {
-    if (isLoading || allStoriesLoaded) return;
-
-    setIsLoading(true);
-    setTimeout(() => {
-      setVisibleStoriesCount(prevCount => prevCount + STORIES_PER_PAGE);
-      setIsLoading(false);
-    }, 1000); // Simulate network delay
-  }, [isLoading, allStoriesLoaded]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting) {
-          loadMoreStories();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    const loader = loaderRef.current;
-    if (loader) {
-      observer.observe(loader);
-    }
-
-    return () => {
-      if (loader) {
-        observer.unobserve(loader);
-      }
-    };
-  }, [loadMoreStories]);
-
-  useEffect(() => {
-    // Reset visible stories when filters change
-    setVisibleStoriesCount(STORIES_PER_PAGE);
-  }, [searchQuery, selectedCategory]);
+  const popularStories = useMemo(() => {
+    // Example logic: sort by views
+    return [...allStories].sort((a, b) => b.views - a.views).slice(0, 6);
+  }, []);
 
   return (
     <div>
@@ -90,69 +37,74 @@ export default function Home() {
           </p>
           <div className="flex gap-4 justify-center">
             <Button asChild size="lg">
-              <Link href="#stories">Start Reading</Link>
+              <Link href="/stories">Start Reading</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-               <Link href="#stories">Browse Categories</Link>
+               <Link href="/stories">Browse All Stories</Link>
             </Button>
           </div>
         </div>
       </section>
 
-      <section id="stories" className="py-16 md:py-24">
+      <section id="featured" className="py-16 md:py-24">
         <div className="container">
-          <h2 className="font-headline text-3xl md:text-4xl font-bold mb-2">Featured Stories</h2>
-          <p className="text-muted-foreground mb-8">Check out some of our most popular stories from talented writers around the world.</p>
-
-          <div className="flex flex-col md:flex-row gap-4 mb-8 justify-center">
-            <div className="relative w-full md:max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search stories..."
-                className="pl-10 h-12"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-[180px] h-12">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {allCategories.map(category => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-headline text-3xl md:text-4xl font-bold">Featured Stories</h2>
+            <Button variant="link" asChild>
+                <Link href="/stories">View All <ArrowRight className="ml-2" /></Link>
+            </Button>
           </div>
-          
-          {storiesToShow.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {storiesToShow.map(story => (
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              {featuredStories.map((story) => (
+                <CarouselItem key={story.id} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="p-1">
+                    <StoryCard story={story} />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
+        </div>
+      </section>
+      
+      <section id="latest" className="py-16 md:py-24 bg-secondary">
+        <div className="container">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-headline text-3xl md:text-4xl font-bold">Latest Stories</h2>
+            <Button variant="link" asChild>
+                <Link href="/stories">View All <ArrowRight className="ml-2" /></Link>
+            </Button>
+          </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {latestStories.map(story => (
                 <StoryCard key={story.id} story={story} />
               ))}
             </div>
-          ) : (
-            <div className="text-center py-16">
-              <p className="text-xl text-muted-foreground">No stories found. Try a different search or category.</p>
-            </div>
-          )}
+        </div>
+      </section>
 
-          <div ref={loaderRef} className="mt-16 text-center">
-            {isLoading && (
-              <div className="flex justify-center items-center gap-2">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="text-muted-foreground">Loading more stories...</span>
-              </div>
-            )}
-            {!isLoading && allStoriesLoaded && storiesToShow.length > 0 && (
-              <div className="p-6 rounded-lg bg-secondary text-secondary-foreground">
-                <h3 className="font-headline text-2xl font-bold">You're all caught up!</h3>
-                <p>You've reached the end of the list.</p>
-              </div>
-            )}
+      <section id="popular" className="py-16 md:py-24">
+        <div className="container">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-headline text-3xl md:text-4xl font-bold">Most Popular</h2>
+             <Button variant="link" asChild>
+                <Link href="/stories">View All <ArrowRight className="ml-2" /></Link>
+            </Button>
           </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {popularStories.map(story => (
+                <StoryCard key={story.id} story={story} />
+              ))}
+            </div>
         </div>
       </section>
     </div>

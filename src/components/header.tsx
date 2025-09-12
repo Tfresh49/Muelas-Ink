@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -41,6 +42,12 @@ export function Header() {
               </span>
             </Link>
           </div>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="/" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Home</Link>
+            <Link href="/stories" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">All Stories</Link>
+            <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Discover</Link>
+            <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Categories</Link>
+          </nav>
           <div className="flex items-center gap-2">
              <Button variant="ghost" size="icon" onClick={showNotifications}>
                 <Bell />
