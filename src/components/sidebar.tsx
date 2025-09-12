@@ -23,9 +23,9 @@ import {
   BookOpen,
   Compass,
   Home,
+  Info,
   Library,
   Settings,
-  Users,
 } from "lucide-react";
 
 
@@ -117,8 +117,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 </Button>
                 <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
                     <Link href="#" className="flex items-center gap-3">
-                        <Users className="h-5 w-5" />
-                        Following
+                        <Info className="h-5 w-5" />
+                        About Us
                     </Link>
                 </Button>
                 <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
