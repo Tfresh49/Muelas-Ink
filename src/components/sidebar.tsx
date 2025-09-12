@@ -18,6 +18,16 @@ import { Input } from "./ui/input";
 import Link from "next/link";
 import { allStories } from "@/lib/data";
 import { Badge } from "./ui/badge";
+import {
+  Award,
+  BookOpen,
+  Compass,
+  Home,
+  Library,
+  Settings,
+  Users,
+} from "lucide-react";
+
 
 interface SidebarProps {
   open: boolean;
@@ -42,11 +52,31 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           </SheetTitle>
         </SheetHeader>
         <div className="flex-grow overflow-y-auto p-6 pt-0">
-          <div className="flex flex-col items-start mb-6">
-            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="/">Home</Link></Button>
-            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="/stories">All Stories</Link></Button>
-            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Discover</Link></Button>
-            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Readers Choice</Link></Button>
+          <div className="flex flex-col items-start gap-2 mb-6">
+            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                <Link href="/" className="flex items-center gap-3">
+                    <Home className="h-5 w-5" />
+                    Home
+                </Link>
+            </Button>
+            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                <Link href="/stories" className="flex items-center gap-3">
+                    <BookOpen className="h-5 w-5" />
+                    All Stories
+                </Link>
+            </Button>
+            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                <Link href="#" className="flex items-center gap-3">
+                    <Compass className="h-5 w-5" />
+                    Discover
+                </Link>
+            </Button>
+            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                <Link href="#" className="flex items-center gap-3">
+                    <Award className="h-5 w-5" />
+                    Readers Choice
+                </Link>
+            </Button>
           </div>
 
           <Input placeholder="Search stories..." className="mb-4" />
@@ -78,10 +108,25 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             ))}
           </Accordion>
 
-            <div className="flex flex-col items-start mt-6 mb-6">
-                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">My Library</Link></Button>
-                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Following</Link></Button>
-                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Settings</Link></Button>
+            <div className="flex flex-col items-start gap-2 mt-6 mb-6">
+                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                    <Link href="#" className="flex items-center gap-3">
+                        <Library className="h-5 w-5" />
+                        My Library
+                    </Link>
+                </Button>
+                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                    <Link href="#" className="flex items-center gap-3">
+                        <Users className="h-5 w-5" />
+                        Following
+                    </Link>
+                </Button>
+                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                    <Link href="#" className="flex items-center gap-3">
+                        <Settings className="h-5 w-5" />
+                        Settings
+                    </Link>
+                </Button>
             </div>
         </div>
          <div className="p-6 border-t mt-auto text-center">
