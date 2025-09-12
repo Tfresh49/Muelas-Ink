@@ -44,8 +44,7 @@ export default function Home() {
     return allStories.filter(story => {
       const matchesCategory = selectedCategory === 'All' || story.category === selectedCategory;
       const matchesSearch = story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            story.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            story.author.toLowerCase().includes(searchQuery.toLowerCase());
+                            story.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
   }, [searchQuery, selectedCategory]);
@@ -64,7 +63,7 @@ export default function Home() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search stories, authors..."
+            placeholder="Search stories..."
             className="pl-10 h-12"
             value={searchQuery}
             onChange={handleSearchChange}

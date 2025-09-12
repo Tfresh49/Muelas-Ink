@@ -8,6 +8,9 @@ export type Story = {
   tags: string[];
   imageUrl: string;
   imageHint: string;
+  rating: number;
+  views: number;
+  likes: number;
 };
 
 export type Comment = {

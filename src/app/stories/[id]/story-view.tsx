@@ -1,11 +1,15 @@
 "use client"
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { Story } from '@/lib/types';
 import Image from 'next/image';
 import CommentSection from '@/components/comment-section';
 import { Badge } from '@/components/ui/badge';
 import { useReadingProgress } from '@/hooks/use-reading-progress';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import Autoplay from "embla-carousel-autoplay";
+
 
 interface StoryViewProps {
   story: Story;
@@ -22,6 +26,8 @@ export default function StoryView({ story }: StoryViewProps) {
         }
     }, [story.title]);
 
+    const storyImages = PlaceHolderImages.filter(img => img.imageHint === story.imageHint);
+
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <article>
@@ -29,7 +35,6 @@ export default function StoryView({ story }: StoryViewProps) {
                     <h1 className="font-headline text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
                         {story.title}
                     </h1>
-                    <p className="text-lg text-muted-foreground">By {story.author}</p>
                     <div className="flex gap-2 mt-4">
                         <Badge variant="outline" className="border-accent text-accent">{story.category}</Badge>
                         {story.tags.map(tag => (
@@ -38,16 +43,27 @@ export default function StoryView({ story }: StoryViewProps) {
                     </div>
                 </header>
 
-                <div className="relative h-64 md:h-96 w-full rounded-lg overflow-hidden mb-8 shadow-lg">
-                    <Image
-                        src={story.imageUrl}
-                        alt={story.title}
-                        fill
-                        className="object-cover"
-                        priority
-                        data-ai-hint={story.imageHint}
-                    />
-                </div>
+                <Carousel
+                  plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]}
+                  className="w-full rounded-lg overflow-hidden mb-8 shadow-lg"
+                >
+                  <CarouselContent>
+                    {storyImages.map((image, index) => (
+                      <CarouselItem key={index}>
+                        <div className="relative h-64 md:h-96 w-full">
+                          <Image
+                            src={image.imageUrl}
+                            alt={story.title}
+                            fill
+                            className="object-cover"
+                            priority={index === 0}
+                            data-ai-hint={image.imageHint}
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                </Carousel>
 
                 <div
                     id="story-content"
