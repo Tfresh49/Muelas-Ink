@@ -5,7 +5,7 @@ import type { Story } from '@/lib/types';
 import Image from 'next/image';
 import CommentSection from '@/components/comment-section';
 import { Badge } from '@/components/ui/badge';
-import { useReadingProgress } from '@/hooks/use-reading-progress';
+import { useReadingProgress } from '@/hooks/use-reading-progress.tsx';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
