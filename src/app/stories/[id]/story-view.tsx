@@ -11,7 +11,7 @@ import { useReadingProgress } from '@/hooks/use-reading-progress';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, UserCircle } from 'lucide-react';
 
 
 interface StoryViewProps {
@@ -44,6 +44,10 @@ export default function StoryView({ story }: StoryViewProps) {
                     <h1 className="font-headline text-4xl md:text-5xl font-extrabold mb-2 leading-tight">
                         {story.title}
                     </h1>
+                     <div className="flex items-center gap-2 text-lg text-muted-foreground mt-4">
+                        <UserCircle className="h-6 w-6" />
+                        <span>{story.author}</span>
+                    </div>
                 </header>
 
                 <Carousel

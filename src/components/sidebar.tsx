@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -75,6 +76,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
               </AccordionItem>
             ))}
           </Accordion>
+
+            <div className="space-y-2 mt-6 mb-6">
+                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">My Library</Link></Button>
+                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Following</Link></Button>
+                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Settings</Link></Button>
+            </div>
         </div>
          <div className="p-6 border-t mt-auto text-center">
             <a href="mailto:brainiacgoatdev@gmail.com" className="text-sm text-muted-foreground hover:text-primary">
