@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { allStories } from '@/lib/data';
 import StoryCard from '@/components/story-card';
 import { Input } from '@/components/ui/input';
-import { Search, Loader2 } from 'lucide-react';
+import { Search } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -13,16 +13,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Pagination } from '@/components/ui/pagination';
 
 const allCategories = ['All', ...Array.from(new Set(allStories.map(story => story.category)))];
-const STORIES_PER_PAGE = 6;
+const STORIES_PER_PAGE = 9;
 
 export default function AllStoriesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [visibleStoriesCount, setVisibleStoriesCount] = useState(STORIES_PER_PAGE);
-  const [isLoading, setIsLoading] = useState(false);
-  const loaderRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredStories = useMemo(() => {
     return allStories.filter(story => {
@@ -33,48 +32,18 @@ export default function AllStoriesPage() {
     });
   }, [searchQuery, selectedCategory]);
 
+  const totalPages = Math.ceil(filteredStories.length / STORIES_PER_PAGE);
+
   const storiesToShow = useMemo(() => {
-    return filteredStories.slice(0, visibleStoriesCount);
-  }, [filteredStories, visibleStoriesCount]);
+    const startIndex = (currentPage - 1) * STORIES_PER_PAGE;
+    const endIndex = startIndex + STORIES_PER_PAGE;
+    return filteredStories.slice(startIndex, endIndex);
+  }, [filteredStories, currentPage]);
 
-  const allStoriesLoaded = visibleStoriesCount >= filteredStories.length;
-
-  const loadMoreStories = useCallback(() => {
-    if (isLoading || allStoriesLoaded) return;
-
-    setIsLoading(true);
-    setTimeout(() => {
-      setVisibleStoriesCount(prevCount => prevCount + STORIES_PER_PAGE);
-      setIsLoading(false);
-    }, 1000); // Simulate network delay
-  }, [isLoading, allStoriesLoaded]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting) {
-          loadMoreStories();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    const loader = loaderRef.current;
-    if (loader) {
-      observer.observe(loader);
-    }
-
-    return () => {
-      if (loader) {
-        observer.unobserve(loader);
-      }
-    };
-  }, [loadMoreStories]);
-
-  useEffect(() => {
-    // Reset visible stories when filters change
-    setVisibleStoriesCount(STORIES_PER_PAGE);
-  }, [searchQuery, selectedCategory]);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="container py-16 md:py-24">
@@ -93,10 +62,16 @@ export default function AllStoriesPage() {
             placeholder="Search stories..."
             className="pl-10 h-12"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1); // Reset to first page on search
+            }}
           />
         </div>
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+        <Select value={selectedCategory} onValueChange={(value) => {
+          setSelectedCategory(value);
+          setCurrentPage(1); // Reset to first page on category change
+        }}>
           <SelectTrigger className="w-full md:w-[180px] h-12">
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
@@ -120,20 +95,15 @@ export default function AllStoriesPage() {
         </div>
       )}
 
-      <div ref={loaderRef} className="mt-16 text-center">
-        {isLoading && (
-          <div className="flex justify-center items-center gap-2">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="text-muted-foreground">Loading more stories...</span>
-          </div>
-        )}
-        {!isLoading && allStoriesLoaded && storiesToShow.length > 0 && (
-          <div className="p-6 rounded-lg bg-secondary text-secondary-foreground">
-            <h3 className="font-headline text-2xl font-bold">You're all caught up!</h3>
-            <p>You've reached the end of the list.</p>
-          </div>
-        )}
-      </div>
+      {totalPages > 1 && (
+        <div className="mt-16 flex justify-center">
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+            />
+        </div>
+      )}
     </div>
   );
 }
