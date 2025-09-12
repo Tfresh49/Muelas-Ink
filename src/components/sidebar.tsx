@@ -42,7 +42,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           </SheetTitle>
         </SheetHeader>
         <div className="flex-grow overflow-y-auto p-6 pt-0">
-          <div className="space-y-2 mb-6">
+          <div className="flex flex-col items-start mb-6">
             <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="/">Home</Link></Button>
             <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="/stories">All Stories</Link></Button>
             <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Discover</Link></Button>
@@ -78,7 +78,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             ))}
           </Accordion>
 
-            <div className="space-y-2 mt-6 mb-6">
+            <div className="flex flex-col items-start mt-6 mb-6">
                 <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">My Library</Link></Button>
                 <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Following</Link></Button>
                 <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Settings</Link></Button>
