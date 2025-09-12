@@ -1,3 +1,59 @@
+
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "story-1",
+      "description": "A mystical forest with glowing mushrooms.",
+      "imageUrl": "https://picsum.photos/seed/101/600/400",
+      "imageHint": "mystical forest"
+    },
+    {
+      "id": "story-2",
+      "description": "A futuristic city skyline at night.",
+      "imageUrl": "https://picsum.photos/seed/102/600/400",
+      "imageHint": "futuristic city"
+    },
+    {
+      "id": "story-3",
+      "description": "An ancient, mysterious stone monolith.",
+      "imageUrl": "https://picsum.photos/seed/103/600/400",
+      "imageHint": "ancient monolith"
+    },
+    {
+      "id": "story-4",
+      "description": "A dragon flying over a mountain range.",
+      "imageUrl": "https://picsum.photos/seed/104/600/400",
+      "imageHint": "dragon mountain"
+    },
+    {
+      "id": "story-5",
+      "description": "A lone spaceship drifting in a colorful nebula.",
+      "imageUrl": "https://picsum.photos/seed/105/600/400",
+      "imageHint": "spaceship nebula"
+    },
+    {
+      "id": "story-6",
+      "description": "A hidden library filled with old, dusty books.",
+      "imageUrl": "https://picsum.photos/seed/106/600/400",
+      "imageHint": "hidden library"
+    },
+    {
+      "id": "user-1",
+      "description": "A portrait of a person.",
+      "imageUrl": "https://picsum.photos/seed/201/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "user-2",
+      "description": "A portrait of another person.",
+      "imageUrl": "https://picsum.photos/seed/202/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "user-3",
+      "description": "A portrait of a third person.",
+      "imageUrl": "https://picsum.photos/seed/203/40/40",
+      "imageHint": "person portrait"
+    }
+  ]
 }
