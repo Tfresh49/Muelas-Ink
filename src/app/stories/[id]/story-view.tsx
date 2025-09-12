@@ -125,8 +125,8 @@ export default function StoryView({ story }: StoryViewProps) {
                         <span className="text-sm text-muted-foreground">Views</span>
                     </div>
                     <div className="flex flex-col items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={handleLike} className="flex items-center gap-2 group">
-                            <Heart className={cn("h-6 w-6 transition-all group-hover:fill-red-500 group-hover:text-red-500", isLiked ? "fill-red-500 text-red-500" : "")} />
+                        <Button variant="ghost" size="icon" onClick={handleLike} className="flex items-center gap-2">
+                            <Heart className={cn("h-6 w-6 transition-all", isLiked ? "fill-red-500 text-red-500" : "")} />
                              <span className="font-bold text-lg">{likes.toLocaleString()}</span>
                         </Button>
                         <span className="text-sm text-muted-foreground">Likes</span>
