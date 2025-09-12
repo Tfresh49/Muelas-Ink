@@ -10,9 +10,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, Eye, Heart } from 'lucide-react';
+import { Star, Eye, Heart, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Skeleton } from './ui/skeleton';
 import { cn } from '@/lib/utils';
 
 interface StoryCardProps {
@@ -44,14 +43,58 @@ export default function StoryCard({ story }: StoryCardProps) {
   ];
 
   useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1000 + Math.random() * 2000); // Simulate loading
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) return; // Don't cycle images while loading
     let imageIndex = 0;
     const interval = setInterval(() => {
         imageIndex = (imageIndex + 1) % images.length;
         setCurrentImage(images[imageIndex]);
-    }, 2000 + Math.random() * 6000);
+    }, 3000 + Math.random() * 3000);
 
     return () => clearInterval(interval);
-  }, [images]);
+  }, [isLoading, images]);
+
+  if (isLoading) {
+    return (
+      <Card className="h-full overflow-hidden flex flex-col justify-center items-center relative">
+          <div className="absolute inset-0 bg-secondary/50 backdrop-blur-sm z-10 flex justify-center items-center">
+             <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+          <CardHeader className="p-0 invisible">
+            <div className="relative h-48 w-full">
+                <Image src={story.imageUrl} alt={story.title} fill className="object-cover" />
+            </div>
+          </CardHeader>
+          <CardContent className="p-6 flex-grow invisible">
+            <CardTitle className="font-headline text-2xl mb-2">{story.title}</CardTitle>
+            <CardDescription>{story.excerpt}</CardDescription>
+          </CardContent>
+           <CardFooter className="flex flex-col items-start gap-4 p-6 pt-0 invisible">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <StarRating rating={story.rating} />
+                    <span>({story.rating.toFixed(1)})</span>
+                </div>
+                <div className="w-full flex justify-between items-center text-sm text-muted-foreground">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
+                            <Eye className="w-4 h-4" />
+                            <span>{story.views.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Heart className="w-4 h-4" />
+                            <span>{story.likes.toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <Badge variant="outline" className="border-primary text-primary">{story.category}</Badge>
+                </div>
+            </CardFooter>
+      </Card>
+    );
+  }
 
   return (
     <Link href={`/stories/${story.id}`} className="group block">
@@ -62,14 +105,9 @@ export default function StoryCard({ story }: StoryCardProps) {
               src={currentImage}
               alt={story.title}
               fill
-              className={cn(
-                "object-cover transition-transform group-hover:scale-105 duration-500 ease-in-out",
-                isLoading ? 'blur-md scale-110' : 'blur-0 scale-100'
-              )}
-              onLoad={() => setIsLoading(false)}
+              className="object-cover transition-all duration-500 ease-in-out group-hover:scale-105"
               data-ai-hint={story.imageHint}
             />
-            {isLoading && <Skeleton className="absolute inset-0" />}
           </div>
         </CardHeader>
         <CardContent className="p-6 flex-grow">
