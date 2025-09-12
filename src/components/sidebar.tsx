@@ -53,25 +53,25 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         </SheetHeader>
         <div className="flex-grow overflow-y-auto p-6 pt-0">
           <div className="flex flex-col items-start gap-2 mb-6">
-            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+            <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
                 <Link href="/" className="flex items-center gap-3">
                     <Home className="h-5 w-5" />
                     Home
                 </Link>
             </Button>
-            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+            <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
                 <Link href="/stories" className="flex items-center gap-3">
                     <BookOpen className="h-5 w-5" />
                     All Stories
                 </Link>
             </Button>
-            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+            <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
                 <Link href="#" className="flex items-center gap-3">
                     <Compass className="h-5 w-5" />
                     Discover
                 </Link>
             </Button>
-            <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+            <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
                 <Link href="#" className="flex items-center gap-3">
                     <Award className="h-5 w-5" />
                     Readers Choice
@@ -109,19 +109,19 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           </Accordion>
 
             <div className="flex flex-col items-start gap-2 mt-6 mb-6">
-                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
                     <Link href="#" className="flex items-center gap-3">
                         <Library className="h-5 w-5" />
                         My Library
                     </Link>
                 </Button>
-                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
                     <Link href="#" className="flex items-center gap-3">
                         <Info className="h-5 w-5" />
                         About Us
                     </Link>
                 </Button>
-                <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild>
+                <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
                     <Link href="#" className="flex items-center gap-3">
                         <Settings className="h-5 w-5" />
                         Settings
