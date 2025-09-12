@@ -26,6 +26,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
               variant="ghost"
               size="icon"
               onClick={onMenuClick}
+              className="md:hidden"
             >
               <Menu />
               <span className="sr-only">Open Menu</span>
