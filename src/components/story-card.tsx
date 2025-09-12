@@ -12,6 +12,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Star, Eye, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Skeleton } from './ui/skeleton';
+import { cn } from '@/lib/utils';
 
 interface StoryCardProps {
   story: Story;
@@ -32,6 +34,7 @@ const StarRating = ({ rating }: { rating: number }) => {
 
 export default function StoryCard({ story }: StoryCardProps) {
   const [currentImage, setCurrentImage] = useState(story.imageUrl);
+  const [isLoading, setIsLoading] = useState(true);
   
   // This is a mock for multiple images. In a real scenario, story would have an array of images.
   const images = [
@@ -59,9 +62,14 @@ export default function StoryCard({ story }: StoryCardProps) {
               src={currentImage}
               alt={story.title}
               fill
-              className="object-cover transition-transform group-hover:scale-105"
+              className={cn(
+                "object-cover transition-transform group-hover:scale-105 duration-500 ease-in-out",
+                isLoading ? 'blur-md scale-110' : 'blur-0 scale-100'
+              )}
+              onLoad={() => setIsLoading(false)}
               data-ai-hint={story.imageHint}
             />
+            {isLoading && <Skeleton className="absolute inset-0" />}
           </div>
         </CardHeader>
         <CardContent className="p-6 flex-grow">

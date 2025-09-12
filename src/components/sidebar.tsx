@@ -5,8 +5,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
-  SheetClose
 } from "@/components/ui/sheet";
 import {
   Accordion,
@@ -19,7 +17,6 @@ import { Input } from "./ui/input";
 import Link from "next/link";
 import { allStories } from "@/lib/data";
 import { Badge } from "./ui/badge";
-import { X } from "lucide-react";
 
 interface SidebarProps {
   open: boolean;
@@ -41,11 +38,6 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         <SheetHeader className="p-6 pb-0">
           <SheetTitle className="flex justify-between items-center">
             <span>Stories: {allStories.length.toLocaleString()}</span>
-             <SheetClose asChild>
-                <Button variant="ghost" size="icon">
-                  <X className="h-4 w-4" />
-                </Button>
-              </SheetClose>
           </SheetTitle>
         </SheetHeader>
         <div className="flex-grow overflow-y-auto p-6">
@@ -84,10 +76,10 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             ))}
           </Accordion>
         </div>
-         <div className="p-6 border-t mt-auto">
-            <p className="text-center text-sm text-muted-foreground">
+         <div className="p-6 border-t mt-auto text-center">
+            <a href="mailto:brainiacgoatdev@gmail.com" className="text-sm text-muted-foreground hover:text-primary">
               Created by Brainiac-Goat-Dev
-            </p>
+            </a>
         </div>
       </SheetContent>
     </Sheet>

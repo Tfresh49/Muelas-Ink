@@ -58,7 +58,6 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t text-center text-muted-foreground">
-            <p className='font-bold text-lg mb-2'>Created by Brainiac-Goat-Dev</p>
           <p>© {new Date().getFullYear()} Muelas Ink. All Rights Reserved.</p>
         </div>
       </div>
