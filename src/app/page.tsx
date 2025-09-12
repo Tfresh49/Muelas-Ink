@@ -1,10 +1,11 @@
+
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { allStories } from '@/lib/data';
 import StoryCard from '@/components/story-card';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -16,10 +17,14 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const allCategories = ['All', ...Array.from(new Set(allStories.map(story => story.category)))];
+const STORIES_PER_PAGE = 3;
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [visibleStoriesCount, setVisibleStoriesCount] = useState(STORIES_PER_PAGE);
+  const [isLoading, setIsLoading] = useState(false);
+  const loaderRef = useRef(null);
 
   const filteredStories = useMemo(() => {
     return allStories.filter(story => {
@@ -28,6 +33,49 @@ export default function Home() {
                             story.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
+  }, [searchQuery, selectedCategory]);
+
+  const storiesToShow = useMemo(() => {
+    return filteredStories.slice(0, visibleStoriesCount);
+  }, [filteredStories, visibleStoriesCount]);
+
+  const allStoriesLoaded = visibleStoriesCount >= filteredStories.length;
+
+  const loadMoreStories = useCallback(() => {
+    if (isLoading || allStoriesLoaded) return;
+
+    setIsLoading(true);
+    setTimeout(() => {
+      setVisibleStoriesCount(prevCount => prevCount + STORIES_PER_PAGE);
+      setIsLoading(false);
+    }, 1000); // Simulate network delay
+  }, [isLoading, allStoriesLoaded]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          loadMoreStories();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    const loader = loaderRef.current;
+    if (loader) {
+      observer.observe(loader);
+    }
+
+    return () => {
+      if (loader) {
+        observer.unobserve(loader);
+      }
+    };
+  }, [loadMoreStories]);
+
+  useEffect(() => {
+    // Reset visible stories when filters change
+    setVisibleStoriesCount(STORIES_PER_PAGE);
   }, [searchQuery, selectedCategory]);
 
   return (
@@ -79,9 +127,9 @@ export default function Home() {
             </Select>
           </div>
           
-          {filteredStories.length > 0 ? (
+          {storiesToShow.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredStories.map(story => (
+              {storiesToShow.map(story => (
                 <StoryCard key={story.id} story={story} />
               ))}
             </div>
@@ -90,6 +138,21 @@ export default function Home() {
               <p className="text-xl text-muted-foreground">No stories found. Try a different search or category.</p>
             </div>
           )}
+
+          <div ref={loaderRef} className="mt-16 text-center">
+            {isLoading && (
+              <div className="flex justify-center items-center gap-2">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="text-muted-foreground">Loading more stories...</span>
+              </div>
+            )}
+            {!isLoading && allStoriesLoaded && storiesToShow.length > 0 && (
+              <div className="p-6 rounded-lg bg-secondary text-secondary-foreground">
+                <h3 className="font-headline text-2xl font-bold">You're all caught up!</h3>
+                <p>You've reached the end of the list.</p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </div>

@@ -1,14 +1,17 @@
+
 "use client"
 
 import { useEffect } from 'react';
 import type { Story } from '@/lib/types';
 import Image from 'next/image';
+import Link from 'next/link';
 import CommentSection from '@/components/comment-section';
 import { Badge } from '@/components/ui/badge';
-import { useReadingProgress } from '@/hooks/use-reading-progress.tsx';
+import { useReadingProgress } from '@/hooks/use-reading-progress';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
+import { ArrowLeft } from 'lucide-react';
 
 
 interface StoryViewProps {
@@ -74,6 +77,13 @@ export default function StoryView({ story }: StoryViewProps) {
 
             <div className="mt-16">
                 <CommentSection storyId={story.id} />
+            </div>
+
+            <div className="mt-16 text-center">
+                <Link href="/" className="inline-flex items-center gap-2 text-primary hover:underline">
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to all stories
+                </Link>
             </div>
         </div>
     );
