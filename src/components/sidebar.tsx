@@ -6,7 +6,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetClose
 } from "@/components/ui/sheet";
 import {
   Accordion,
@@ -19,7 +18,6 @@ import { Input } from "./ui/input";
 import Link from "next/link";
 import { allStories } from "@/lib/data";
 import { Badge } from "./ui/badge";
-import { X } from "lucide-react";
 
 interface SidebarProps {
   open: boolean;
@@ -38,20 +36,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full md:w-[400px] sm:max-w-full p-0 flex flex-col">
-        <SheetHeader className="p-6 pb-4 flex flex-row justify-between items-center">
+        <SheetHeader className="p-6 pb-4">
           <SheetTitle>
             Stories: {allStories.length.toLocaleString()}
           </SheetTitle>
-           <SheetClose asChild>
-            <Button variant="ghost" size="icon">
-              <X className="h-5 w-5" />
-              <span className="sr-only">Close</span>
-            </Button>
-          </SheetClose>
         </SheetHeader>
         <div className="flex-grow overflow-y-auto p-6 pt-0">
-          <Input placeholder="Search stories..." className="mb-4" />
-          
           <div className="space-y-2 mb-6">
             <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="/">Home</Link></Button>
             <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="/stories">All Stories</Link></Button>
@@ -59,6 +49,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             <Button variant="link" className="p-0 h-auto text-lg text-accent-foreground" asChild><Link href="#">Readers Choice</Link></Button>
           </div>
 
+          <Input placeholder="Search stories..." className="mb-4" />
+          
           <h3 className="font-headline text-lg font-semibold mb-2">Hot Tags</h3>
           <div className="flex flex-wrap gap-2 mb-6">
             {hotTags.map(tag => (

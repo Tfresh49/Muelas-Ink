@@ -16,6 +16,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isStoryPage = pathname.startsWith('/stories/');
+  const isAllStoriesPage = pathname === '/stories';
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -37,7 +38,7 @@ export default function RootLayout({
           <main className="min-h-screen bg-background pt-16">
             {children}
           </main>
-          {!isStoryPage && <Footer />}
+          {!isStoryPage && !isAllStoriesPage && <Footer />}
           <Toaster />
         </ThemeProvider>
       </body>
