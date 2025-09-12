@@ -5,12 +5,9 @@ import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
 import { Bell, Menu, PenSquare } from "lucide-react";
 import { Button } from "./ui/button";
-import { Sidebar } from "./sidebar";
-import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
-export function Header() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const { toast } = useToast();
 
   const showNotifications = () => {
@@ -22,15 +19,13 @@ export function Header() {
 
   return (
     <>
-      <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
       <header className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
-              onClick={() => setSidebarOpen(true)}
+              onClick={onMenuClick}
             >
               <Menu />
               <span className="sr-only">Open Menu</span>
@@ -55,7 +50,7 @@ export function Header() {
             </Button>
             <ThemeToggle />
             <div className="hidden md:block">
-              <Button onClick={() => setSidebarOpen(true)}>
+              <Button onClick={onMenuClick}>
                 <Menu className="mr-2" />
                 Menu
               </Button>

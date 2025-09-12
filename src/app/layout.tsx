@@ -1,13 +1,14 @@
 
 "use client";
 
-import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Header } from '@/components/header';
 import { Toaster } from "@/components/ui/toaster"
 import { Footer } from '@/components/footer';
 import { usePathname } from 'next/navigation';
+import { Sidebar } from '@/components/sidebar';
+import { useState } from 'react';
 
 export default function RootLayout({
   children,
@@ -16,6 +17,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isHomePage = pathname === '/';
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -33,7 +35,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
+          <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
+          <Header onMenuClick={() => setSidebarOpen(true)} />
           <main className="min-h-screen bg-background pt-16">
             {children}
           </main>
