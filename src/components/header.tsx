@@ -35,8 +35,8 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Home</Link>
             <Link href="/stories" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">All Stories</Link>
-            <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Discover</Link>
-            <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Categories</Link>
+            <Link href="/discover" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Discover</Link>
+            <Link href="/categories" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Categories</Link>
           </nav>
           <div className="flex items-center gap-2">
              <div className="hidden md:block">

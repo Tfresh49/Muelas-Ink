@@ -66,13 +66,13 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 </Link>
             </Button>
             <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
-                <Link href="#" className="flex items-center gap-3">
+                <Link href="/discover" className="flex items-center gap-3">
                     <Compass className="h-5 w-5" />
                     Discover
                 </Link>
             </Button>
             <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
-                <Link href="#" className="flex items-center gap-3">
+                <Link href="/readers-choice" className="flex items-center gap-3">
                     <Award className="h-5 w-5" />
                     Readers Choice
                 </Link>
@@ -99,7 +99,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                   <div className="flex flex-col items-start pl-4">
                      {subCategories[category] ? (
                         subCategories[category].map(sub => (
-                             <Button variant="link" className="p-0 h-auto text-muted-foreground" key={sub} asChild><Link href="#">{sub}</Link></Button>
+                             <Button variant="link" className="p-0 h-auto text-muted-foreground" key={sub} asChild><Link href={`/categories?subcategory=${sub}`}>{sub}</Link></Button>
                         ))
                      ) : (
                         <span className="text-muted-foreground text-sm">No sub-categories</span>
@@ -112,19 +112,19 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
             <div className="flex flex-col items-start gap-2 mt-6 mb-6">
                 <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
-                    <Link href="#" className="flex items-center gap-3">
+                    <Link href="/library" className="flex items-center gap-3">
                         <Library className="h-5 w-5" />
                         My Library
                     </Link>
                 </Button>
                 <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
-                    <Link href="#" className="flex items-center gap-3">
+                    <Link href="/about" className="flex items-center gap-3">
                         <Info className="h-5 w-5" />
                         About Us
                     </Link>
                 </Button>
                 <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
-                    <Link href="#" className="flex items-center gap-3">
+                    <Link href="/settings" className="flex items-center gap-3">
                         <Settings className="h-5 w-5" />
                         Settings
                     </Link>
