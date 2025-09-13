@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import RelatedStories from './related-stories';
+import ReadingProgressBar from '@/components/reading-progress-bar';
 
 
 interface StoryViewProps {
@@ -91,121 +92,124 @@ export default function StoryView({ story }: StoryViewProps) {
     const storyImages = PlaceHolderImages.filter(img => img.imageHint === story.imageHint);
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
-            <article>
-                <header className="mb-8">
-                     <div className="flex gap-2 mb-4">
-                        <Badge variant="outline" className="border-accent text-accent">{story.category}</Badge>
-                        {story.tags.map(tag => (
-                            <Badge key={tag} variant="secondary">{tag}</Badge>
+        <>
+            <ReadingProgressBar />
+            <div className="container mx-auto px-4 py-8 max-w-4xl">
+                <article>
+                    <header className="mb-8">
+                        <div className="flex gap-2 mb-4">
+                            <Badge variant="outline" className="border-accent text-accent">{story.category}</Badge>
+                            {story.tags.map(tag => (
+                                <Badge key={tag} variant="secondary">{tag}</Badge>
+                            ))}
+                        </div>
+                        <h1 className="font-headline text-4xl md:text-5xl font-extrabold mb-2 leading-tight">
+                            {story.title}
+                        </h1>
+                        <div className="flex items-center gap-2 text-lg text-muted-foreground mt-4">
+                            <UserCircle className="h-6 w-6" />
+                            <span>{story.author}</span>
+                        </div>
+                    </header>
+
+                    <Carousel
+                    plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]}
+                    className="w-full rounded-lg overflow-hidden mb-8 shadow-lg"
+                    >
+                    <CarouselContent>
+                        {storyImages.map((image, index) => (
+                        <CarouselItem key={index}>
+                            <div className="relative h-64 md:h-96 w-full">
+                            <Image
+                                src={image.imageUrl}
+                                alt={story.title}
+                                fill
+                                className="object-cover"
+                                priority={index === 0}
+                                data-ai-hint={image.imageHint}
+                            />
+                            </div>
+                        </CarouselItem>
                         ))}
-                    </div>
-                    <h1 className="font-headline text-4xl md:text-5xl font-extrabold mb-2 leading-tight">
-                        {story.title}
-                    </h1>
-                     <div className="flex items-center gap-2 text-lg text-muted-foreground mt-4">
-                        <UserCircle className="h-6 w-6" />
-                        <span>{story.author}</span>
-                    </div>
-                </header>
-
-                <Carousel
-                  plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]}
-                  className="w-full rounded-lg overflow-hidden mb-8 shadow-lg"
-                >
-                  <CarouselContent>
-                    {storyImages.map((image, index) => (
-                      <CarouselItem key={index}>
-                        <div className="relative h-64 md:h-96 w-full">
-                          <Image
-                            src={image.imageUrl}
-                            alt={story.title}
-                            fill
-                            className="object-cover"
-                            priority={index === 0}
-                            data-ai-hint={image.imageHint}
-                          />
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                </Carousel>
-                
-                <div className="my-8 p-4 bg-secondary rounded-lg flex flex-wrap justify-around items-center text-center gap-4">
-                    <div className="flex flex-col items-center gap-1">
-                        <div className="flex items-center gap-2">
-                           <StarRating rating={story.rating} />
-                        </div>
-                        <span className="text-sm text-muted-foreground">({story.rating.toFixed(1)} Rating)</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                         <div className="flex items-center gap-2">
-                            <Eye className="h-6 w-6" />
-                            <span className="font-bold text-lg">{story.views.toLocaleString()}</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">Views</span>
-                    </div>
-                    <div className="flex items-center gap-4">
+                    </CarouselContent>
+                    </Carousel>
+                    
+                    <div className="my-8 p-4 bg-secondary rounded-lg flex flex-wrap justify-around items-center text-center gap-4">
                         <div className="flex flex-col items-center gap-1">
-                            <Button variant="ghost" size="icon" onClick={handleLike} className="flex items-center gap-2">
-                                <Heart className={cn("h-6 w-6 transition-all", isLiked ? "fill-red-500 text-red-500" : "")} />
-                                <span className="font-bold text-lg">{likes.toLocaleString()}</span>
-                            </Button>
-                            <span className="text-sm text-muted-foreground">Likes</span>
+                            <div className="flex items-center gap-2">
+                            <StarRating rating={story.rating} />
+                            </div>
+                            <span className="text-sm text-muted-foreground">({story.rating.toFixed(1)} Rating)</span>
                         </div>
                         <div className="flex flex-col items-center gap-1">
-                            <Button variant="ghost" size="icon" onClick={handleBookmark}>
-                                <Bookmark className={cn("h-6 w-6 transition-all", isBookmarked ? "fill-yellow-400 text-yellow-500" : "")} />
-                            </Button>
-                            <span className="text-sm text-muted-foreground">Bookmark</span>
+                            <div className="flex items-center gap-2">
+                                <Eye className="h-6 w-6" />
+                                <span className="font-bold text-lg">{story.views.toLocaleString()}</span>
+                            </div>
+                            <span className="text-sm text-muted-foreground">Views</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className="flex flex-col items-center gap-1">
+                                <Button variant="ghost" size="icon" onClick={handleLike} className="flex items-center gap-2">
+                                    <Heart className={cn("h-6 w-6 transition-all", isLiked ? "fill-red-500 text-red-500" : "")} />
+                                    <span className="font-bold text-lg">{likes.toLocaleString()}</span>
+                                </Button>
+                                <span className="text-sm text-muted-foreground">Likes</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                                <Button variant="ghost" size="icon" onClick={handleBookmark}>
+                                    <Bookmark className={cn("h-6 w-6 transition-all", isBookmarked ? "fill-yellow-400 text-yellow-500" : "")} />
+                                </Button>
+                                <span className="text-sm text-muted-foreground">Bookmark</span>
+                            </div>
                         </div>
                     </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 my-8">
+                        <Select defaultValue="1">
+                            <SelectTrigger className="w-full sm:w-[180px]">
+                                <SelectValue placeholder="Season" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="1">Season 1</SelectItem>
+                                <SelectItem value="2" disabled>Season 2 (Coming Soon)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select defaultValue="1">
+                            <SelectTrigger className="w-full sm:w-[180px]">
+                                <SelectValue placeholder="Episode" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="1">Ep. 1: The Beginning</SelectItem>
+                                <SelectItem value="2">Ep. 2: The Middle</SelectItem>
+                                <SelectItem value="3">Ep. 3: The End</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div
+                        id="story-content"
+                        className="prose prose-lg dark:prose-invert max-w-none font-body text-foreground/90 leading-relaxed space-y-6"
+                        dangerouslySetInnerHTML={{ __html: story.content.replace(/\n/g, '<br />') }}
+                    />
+                </article>
+
+                <div className="mt-16">
+                    <RelatedStories currentStoryId={story.id} />
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 my-8">
-                    <Select defaultValue="1">
-                        <SelectTrigger className="w-full sm:w-[180px]">
-                            <SelectValue placeholder="Season" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="1">Season 1</SelectItem>
-                            <SelectItem value="2" disabled>Season 2 (Coming Soon)</SelectItem>
-                        </SelectContent>
-                    </Select>
-                     <Select defaultValue="1">
-                        <SelectTrigger className="w-full sm:w-[180px]">
-                            <SelectValue placeholder="Episode" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="1">Ep. 1: The Beginning</SelectItem>
-                            <SelectItem value="2">Ep. 2: The Middle</SelectItem>
-                            <SelectItem value="3">Ep. 3: The End</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="mt-16">
+                    <CommentSection storyId={story.id} />
                 </div>
 
-                <div
-                    id="story-content"
-                    className="prose prose-lg dark:prose-invert max-w-none font-body text-foreground/90 leading-relaxed space-y-6"
-                    dangerouslySetInnerHTML={{ __html: story.content.replace(/\n/g, '<br />') }}
-                />
-            </article>
-
-            <div className="mt-16">
-                <RelatedStories currentStoryId={story.id} />
+                <div className="mt-16 text-center">
+                    <Button variant="link" onClick={() => router.back()} className="inline-flex items-center gap-2 text-primary hover:underline">
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to all stories
+                    </Button>
+                </div>
             </div>
-
-            <div className="mt-16">
-                <CommentSection storyId={story.id} />
-            </div>
-
-            <div className="mt-16 text-center">
-                <Button variant="link" onClick={() => router.back()} className="inline-flex items-center gap-2 text-primary hover:underline">
-                    <ArrowLeft className="h-4 w-4" />
-                    Back to all stories
-                </Button>
-            </div>
-        </div>
+        </>
     );
 
     
