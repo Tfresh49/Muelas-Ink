@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import Notifications from "./notifications";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 
 export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const { toast } = useToast();
@@ -61,18 +61,15 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full">
+                  <SheetHeader>
+                    <SheetTitle className="sr-only">Notifications</SheetTitle>
+                  </SheetHeader>
                   <Notifications />
                 </SheetContent>
               </Sheet>
             </div>
             <ThemeToggle />
-            <div className="hidden md:block">
-              <Button onClick={onMenuClick}>
-                <Menu className="mr-2" />
-                Menu
-              </Button>
-            </div>
-             <Button
+            <Button
               variant="ghost"
               size="icon"
               onClick={onMenuClick}
@@ -81,6 +78,12 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
               <Menu />
               <span className="sr-only">Open Menu</span>
             </Button>
+            <div className="hidden md:block">
+              <Button onClick={onMenuClick}>
+                <Menu className="mr-2" />
+                Menu
+              </Button>
+            </div>
           </div>
         </div>
       </header>
