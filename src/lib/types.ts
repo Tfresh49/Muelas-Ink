@@ -62,3 +62,23 @@ export type Event = {
     speaker?: string;
   }[];
 };
+
+export interface Notification {
+    icon: 'star' | 'comment' | 'follower' | 'update';
+    title: string;
+    description: string;
+    time: string;
+    href: string;
+}
+
+export type FeedItem = {
+    id: string;
+    author: string;
+    authorSlug: string;
+    authorAvatar: string;
+    time: string;
+    content: string;
+    imageUrl?: string;
+    likes: number;
+    commentsCount: number;
+};
