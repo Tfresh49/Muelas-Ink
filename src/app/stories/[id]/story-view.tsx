@@ -11,9 +11,11 @@ import { useReadingProgress } from '@/hooks/use-reading-progress';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
-import { ArrowLeft, UserCircle, Heart, Eye, Star } from 'lucide-react';
+import { ArrowLeft, UserCircle, Heart, Eye, Star, Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import RelatedStories from './related-stories';
 
 
 interface StoryViewProps {
@@ -39,6 +41,7 @@ export default function StoryView({ story }: StoryViewProps) {
 
     const [likes, setLikes] = useState(story.likes);
     const [isLiked, setIsLiked] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(false);
     const router = useRouter();
 
 
@@ -54,6 +57,11 @@ export default function StoryView({ story }: StoryViewProps) {
             setIsLiked(true);
         }
 
+        const bookmarkedStories = JSON.parse(localStorage.getItem('bookmarkedStories') || '{}');
+        if (bookmarkedStories[story.id]) {
+            setIsBookmarked(true);
+        }
+
     }, [story.id, story.title]);
 
     const handleLike = () => {
@@ -67,6 +75,17 @@ export default function StoryView({ story }: StoryViewProps) {
       }
       setIsLiked(!isLiked);
       localStorage.setItem('likedStories', JSON.stringify(likedStories));
+    };
+
+    const handleBookmark = () => {
+        const bookmarkedStories = JSON.parse(localStorage.getItem('bookmarkedStories') || '{}');
+        if (isBookmarked) {
+            delete bookmarkedStories[story.id];
+        } else {
+            bookmarkedStories[story.id] = true;
+        }
+        setIsBookmarked(!isBookmarked);
+        localStorage.setItem('bookmarkedStories', JSON.stringify(bookmarkedStories));
     };
 
     const storyImages = PlaceHolderImages.filter(img => img.imageHint === story.imageHint);
@@ -112,7 +131,7 @@ export default function StoryView({ story }: StoryViewProps) {
                   </CarouselContent>
                 </Carousel>
                 
-                <div className="my-8 p-4 bg-secondary rounded-lg flex justify-around items-center text-center">
+                <div className="my-8 p-4 bg-secondary rounded-lg flex flex-wrap justify-around items-center text-center gap-4">
                     <div className="flex flex-col items-center gap-1">
                         <div className="flex items-center gap-2">
                            <StarRating rating={story.rating} />
@@ -126,15 +145,44 @@ export default function StoryView({ story }: StoryViewProps) {
                         </div>
                         <span className="text-sm text-muted-foreground">Views</span>
                     </div>
-                    <div className="flex flex-col items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={handleLike} className="flex items-center gap-2">
-                            <Heart className={cn("h-6 w-6 transition-all", isLiked ? "fill-red-500 text-red-500" : "")} />
-                             <span className="font-bold text-lg">{likes.toLocaleString()}</span>
-                        </Button>
-                        <span className="text-sm text-muted-foreground">Likes</span>
+                    <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-center gap-1">
+                            <Button variant="ghost" size="icon" onClick={handleLike} className="flex items-center gap-2">
+                                <Heart className={cn("h-6 w-6 transition-all", isLiked ? "fill-red-500 text-red-500" : "")} />
+                                <span className="font-bold text-lg">{likes.toLocaleString()}</span>
+                            </Button>
+                            <span className="text-sm text-muted-foreground">Likes</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1">
+                            <Button variant="ghost" size="icon" onClick={handleBookmark}>
+                                <Bookmark className={cn("h-6 w-6 transition-all", isBookmarked ? "fill-yellow-400 text-yellow-500" : "")} />
+                            </Button>
+                            <span className="text-sm text-muted-foreground">Bookmark</span>
+                        </div>
                     </div>
                 </div>
 
+                <div className="flex flex-col sm:flex-row gap-4 my-8">
+                    <Select defaultValue="1">
+                        <SelectTrigger className="w-full sm:w-[180px]">
+                            <SelectValue placeholder="Season" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="1">Season 1</SelectItem>
+                            <SelectItem value="2" disabled>Season 2 (Coming Soon)</SelectItem>
+                        </SelectContent>
+                    </Select>
+                     <Select defaultValue="1">
+                        <SelectTrigger className="w-full sm:w-[180px]">
+                            <SelectValue placeholder="Episode" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="1">Ep. 1: The Beginning</SelectItem>
+                            <SelectItem value="2">Ep. 2: The Middle</SelectItem>
+                            <SelectItem value="3">Ep. 3: The End</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
 
                 <div
                     id="story-content"
@@ -142,6 +190,10 @@ export default function StoryView({ story }: StoryViewProps) {
                     dangerouslySetInnerHTML={{ __html: story.content.replace(/\n/g, '<br />') }}
                 />
             </article>
+
+            <div className="mt-16">
+                <RelatedStories currentStoryId={story.id} />
+            </div>
 
             <div className="mt-16">
                 <CommentSection storyId={story.id} />
