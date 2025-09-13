@@ -1,4 +1,5 @@
 
+
 export type Story = {
   id: string;
   title: string;
@@ -16,7 +17,7 @@ export type Story = {
 };
 
 export type Comment = {
-  id: string;
+  id:string;
   storyId: string;
   author: string;
   content: string;
@@ -40,4 +41,24 @@ export type Reel = {
   likes: number;
   comments: { author: string; text: string }[];
   aspectRatio: 'portrait' | 'landscape';
+};
+
+export type Event = {
+  id: string;
+  title: string;
+  date: {
+    day: string;
+    month: string;
+    year: string;
+  };
+  location: string;
+  venue: string;
+  description: string;
+  longDescription: string;
+  imageUrl: string;
+  schedule: {
+    time: string;
+    topic: string;
+    speaker?: string;
+  }[];
 };

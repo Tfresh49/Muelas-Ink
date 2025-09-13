@@ -1,5 +1,7 @@
 
+
 import { allAuthors, allStories, allReels } from '@/lib/data';
+import { allEvents } from '@/lib/events-data';
 import { notFound } from 'next/navigation';
 import StoryCard from '@/components/story-card';
 import AuthorCard from '@/components/author-card';
@@ -9,6 +11,7 @@ import ReelCard from '@/components/reel-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface AuthorPageProps {
   params: {
@@ -64,25 +67,27 @@ const PodcastItem = ({ title, description, audioSrc, imageUrl }: { title: string
     </Card>
 );
 
-const EventItem = ({ date, title, location, description }: { date: { day: string, month: string }, title: string, location: string, description:string }) => (
-    <Card className="flex flex-col md:flex-row">
-        <div className="bg-secondary p-6 flex flex-col items-center justify-center rounded-t-lg md:rounded-l-lg md:rounded-t-none">
-            <span className="font-headline text-4xl text-primary">{date.day}</span>
-            <span className="font-semibold">{date.month}</span>
-        </div>
-        <div className="p-6 flex-grow">
-            <h3 className="font-headline text-2xl mb-2">{title}</h3>
-            <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                <MapPin className="h-4 w-4" />
-                <span>{location}</span>
+const EventItem = ({ event }: { event: typeof allEvents[0] }) => (
+    <Link href={`/events/${event.id}`} className="block">
+        <Card className="flex flex-col md:flex-row transition-all hover:shadow-md hover:border-primary/50">
+            <div className="bg-secondary p-6 flex flex-col items-center justify-center rounded-t-lg md:rounded-l-lg md:rounded-t-none">
+                <span className="font-headline text-4xl text-primary">{event.date.day}</span>
+                <span className="font-semibold">{event.date.month}</span>
             </div>
-            <p className="text-muted-foreground mb-4">{description}</p>
-            <Button>
-                <Ticket className="mr-2 h-4 w-4" />
-                Get Tickets
-            </Button>
-        </div>
-    </Card>
+            <div className="p-6 flex-grow">
+                <h3 className="font-headline text-2xl mb-2">{event.title}</h3>
+                <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>{event.location}</span>
+                </div>
+                <p className="text-muted-foreground mb-4">{event.description}</p>
+                <Button>
+                    <Ticket className="mr-2 h-4 w-4" />
+                    View Details
+                </Button>
+            </div>
+        </Card>
+    </Link>
 );
 
 
@@ -95,6 +100,7 @@ export default function AuthorPage({ params }: AuthorPageProps) {
 
   const authorStories = allStories.filter(s => s.authorSlug === author.urlSlug);
   const authorReels = allReels.filter(r => r.authorSlug === author.urlSlug);
+  const authorEvents = allEvents; // Assuming all events are by the main author for now
 
   return (
     <div className="container py-16 md:py-24">
@@ -153,18 +159,9 @@ export default function AuthorPage({ params }: AuthorPageProps) {
                     />
                 </TabsContent>
                 <TabsContent value="events" className="mt-8 max-w-3xl mx-auto space-y-8">
-                    <EventItem
-                        date={{ day: '15', month: 'AUG' }}
-                        title="Book Signing & Q&A for 'Emberwing'"
-                        location="The Grand Library, Neo-Veridia"
-                        description="Join me for a live reading, Q&A session, and book signing for the release of my latest novel, Emberwing."
-                    />
-                     <EventItem
-                        date={{ day: '22', month: 'SEP' }}
-                        title="Fantasy Writers Convention - Keynote"
-                        location="Online Virtual Event"
-                        description="I'll be giving the keynote speech on 'The Power of Myth in Modern Storytelling' at this year's convention."
-                    />
+                    {authorEvents.map(event => (
+                        <EventItem key={event.id} event={event} />
+                    ))}
                 </TabsContent>
             </Tabs>
         </div>
