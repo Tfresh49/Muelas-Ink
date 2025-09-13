@@ -97,7 +97,7 @@ export default function StoryCard({ story }: StoryCardProps) {
   }
 
   return (
-    <Link href={`/stories/${story.id}`} className="group block">
+    <Link href={`/stories/${story.id}`} className="group block" id={story.id}>
       <Card className="h-full overflow-hidden transition-all group-hover:shadow-lg group-hover:border-primary flex flex-col">
         <CardHeader className="p-0">
           <div className="relative h-48 w-full">

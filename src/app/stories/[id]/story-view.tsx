@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import type { Story } from '@/lib/types';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import CommentSection from '@/components/comment-section';
 import { Badge } from '@/components/ui/badge';
 import { useReadingProgress } from '@/hooks/use-reading-progress';
@@ -39,6 +39,8 @@ export default function StoryView({ story }: StoryViewProps) {
 
     const [likes, setLikes] = useState(story.likes);
     const [isLiked, setIsLiked] = useState(false);
+    const router = useRouter();
+
 
     useEffect(() => {
         const history = JSON.parse(localStorage.getItem('readingHistory') || '[]');
@@ -146,10 +148,10 @@ export default function StoryView({ story }: StoryViewProps) {
             </div>
 
             <div className="mt-16 text-center">
-                <Link href="/" className="inline-flex items-center gap-2 text-primary hover:underline">
+                <Button variant="link" onClick={() => router.back()} className="inline-flex items-center gap-2 text-primary hover:underline">
                     <ArrowLeft className="h-4 w-4" />
                     Back to all stories
-                </Link>
+                </Button>
             </div>
         </div>
     );
