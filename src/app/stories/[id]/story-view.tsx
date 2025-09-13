@@ -294,7 +294,4 @@ export default function StoryView({ story }: StoryViewProps) {
             </div>
         </>
     );
-
-    
-
-
+}
