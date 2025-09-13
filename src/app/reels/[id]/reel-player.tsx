@@ -174,7 +174,7 @@ export default function ReelPlayer({ reel }: ReelPlayerProps) {
           showComments ? 'translate-y-0' : 'translate-y-full',
           isLandscapeFullscreen ? 'max-w-sm right-0 left-auto' : 'max-w-sm mx-auto'
       )}>
-        <div className="w-full flex-grow flex flex-col">
+        <div className="w-full flex-grow flex flex-col overflow-hidden">
             <div className="flex justify-between items-center mb-4 flex-shrink-0">
                 <h3 className="font-headline text-xl">Comments ({comments.length})</h3>
                 <button onClick={() => setShowComments(false)}><X /></button>
