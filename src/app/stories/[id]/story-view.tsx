@@ -40,6 +40,15 @@ const StarRating = ({ rating }: { rating: number }) => {
   return <div className="flex items-center">{stars}</div>;
 };
 
+// Map display names to API voice names
+const voiceOptions: Record<string, string> = {
+    'Standard': 'Algenib', // Default
+    'Deep': 'Regulus', 
+    'Bright': 'Tiamat',
+    'Calm': 'Mirfak',
+};
+const voiceDisplayNames = Object.keys(voiceOptions);
+
 
 export default function StoryView({ story }: StoryViewProps) {
     useReadingProgress(story.id);
@@ -49,12 +58,14 @@ export default function StoryView({ story }: StoryViewProps) {
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [audioDataUri, setAudioDataUri] = useState<string | null>(null);
     const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
+    const [selectedVoice, setSelectedVoice] = useState(voiceDisplayNames[0]);
     const router = useRouter();
     const { toast } = useToast();
-
+    
+    const getAudioStorageKey = (voice: string) => `audio-${story.id}-${voice}`;
 
     useEffect(() => {
-        const history = JSON.parse(localStorage.getItem('readingHistory') || '[]');
+        const history = JSON.parse(localStorage.getItem('readingHistory') || '[]').join(', ');
         if (!history.includes(story.title)) {
             const newHistory = [...history, story.title];
             localStorage.setItem('readingHistory', JSON.stringify(newHistory.slice(-10))); // Limit history size
@@ -70,12 +81,15 @@ export default function StoryView({ story }: StoryViewProps) {
             setIsBookmarked(true);
         }
 
-        const storedAudio = localStorage.getItem(`audio-${story.id}`);
+        // Load audio for the currently selected voice
+        const storedAudio = localStorage.getItem(getAudioStorageKey(selectedVoice));
         if(storedAudio) {
             setAudioDataUri(storedAudio);
+        } else {
+            setAudioDataUri(null);
         }
 
-    }, [story.id, story.title]);
+    }, [story.id, story.title, selectedVoice]);
 
     const handleLike = () => {
       const likedStories = JSON.parse(localStorage.getItem('likedStories') || '{}');
@@ -128,16 +142,18 @@ export default function StoryView({ story }: StoryViewProps) {
     };
     
     const handleListen = async () => {
-        if (audioDataUri) {
-            // If we already have audio, just ensure it's visible.
-            // This case might be useful if we decide to hide the player initially.
+        const cachedAudio = localStorage.getItem(getAudioStorageKey(selectedVoice));
+        if (cachedAudio) {
+            setAudioDataUri(cachedAudio);
             return;
         }
+
         setIsGeneratingAudio(true);
         try {
-            const response = await generateStoryAudio({ storyContent: story.content });
+            const voiceName = voiceOptions[selectedVoice];
+            const response = await generateStoryAudio({ storyContent: story.content, voiceName });
             setAudioDataUri(response.audioDataUri);
-            localStorage.setItem(`audio-${story.id}`, response.audioDataUri);
+            localStorage.setItem(getAudioStorageKey(selectedVoice), response.audioDataUri);
         } catch (error) {
             console.error("Failed to generate audio:", error);
             toast({
@@ -235,29 +251,32 @@ export default function StoryView({ story }: StoryViewProps) {
                     </div>
 
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 my-8">
-                      <div className="flex flex-col sm:flex-row gap-4">
-                          <Select defaultValue="1">
-                              <SelectTrigger className="w-full sm:w-[180px]">
-                                  <SelectValue placeholder="Season" />
+                        <div className="w-full sm:w-auto">
+                            <Select defaultValue="1">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Episode" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="1">Ep. 1: The Beginning</SelectItem>
+                                    <SelectItem value="2">Ep. 2: The Middle</SelectItem>
+                                    <SelectItem value="3">Ep. 3: The End</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                      <div className="flex flex-col sm:flex-row items-center gap-2">
+                          <Select onValueChange={setSelectedVoice} value={selectedVoice}>
+                              <SelectTrigger className="w-full sm:w-[140px]">
+                                  <SelectValue placeholder="Select Voice" />
                               </SelectTrigger>
                               <SelectContent>
-                                  <SelectItem value="1">Season 1</SelectItem>
-                                  <SelectItem value="2" disabled>Season 2 (Coming Soon)</SelectItem>
+                                  {voiceDisplayNames.map(name => (
+                                    <SelectItem key={name} value={name}>{name}</SelectItem>
+                                  ))}
                               </SelectContent>
                           </Select>
-                          <Select defaultValue="1">
-                              <SelectTrigger className="w-full sm:w-[180px]">
-                                  <SelectValue placeholder="Episode" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                  <SelectItem value="1">Ep. 1: The Beginning</SelectItem>
-                                  <SelectItem value="2">Ep. 2: The Middle</SelectItem>
-                                  <SelectItem value="3">Ep. 3: The End</SelectItem>
-                              </SelectContent>
-                          </Select>
-                      </div>
-                       <Button onClick={handleListen} disabled={isGeneratingAudio && !audioDataUri}>
-                            {isGeneratingAudio && !audioDataUri ? (
+                       <Button onClick={handleListen} disabled={isGeneratingAudio}>
+                            {isGeneratingAudio ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Generating...
@@ -269,11 +288,12 @@ export default function StoryView({ story }: StoryViewProps) {
                                 </>
                             )}
                         </Button>
+                      </div>
                     </div>
 
                      {audioDataUri && (
                         <div className="my-8">
-                           <AudioPlayer src={audioDataUri} storageKey={`audio-progress-${story.id}`} />
+                           <AudioPlayer src={audioDataUri} storageKey={`tts-progress-${story.id}`} />
                         </div>
                     )}
 

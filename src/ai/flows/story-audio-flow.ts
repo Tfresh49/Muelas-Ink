@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -13,6 +14,7 @@ import { googleAI } from '@genkit-ai/googleai';
 
 const GenerateStoryAudioInputSchema = z.object({
   storyContent: z.string().describe('The text content of the story to be converted to audio.'),
+  voiceName: z.string().optional().describe('The prebuilt voice to use for generation.'),
 });
 export type GenerateStoryAudioInput = z.infer<typeof GenerateStoryAudioInputSchema>;
 
@@ -53,14 +55,14 @@ const generateStoryAudioFlow = ai.defineFlow(
     inputSchema: GenerateStoryAudioInputSchema,
     outputSchema: GenerateStoryAudioOutputSchema,
   },
-  async ({ storyContent }) => {
+  async ({ storyContent, voiceName }) => {
     const { media } = await ai.generate({
       model: googleAI.model('gemini-2.5-flash-preview-tts'),
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Algenib' },
+            prebuiltVoiceConfig: { voiceName: voiceName || 'Algenib' },
           },
         },
       },
