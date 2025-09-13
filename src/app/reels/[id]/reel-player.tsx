@@ -124,7 +124,7 @@ export default function ReelPlayer({ reel }: ReelPlayerProps) {
         isLandscape 
             ? (isLandscapeFullscreen ? 'w-full h-full' : 'w-full max-w-4xl aspect-video')
             : 'w-full h-full md:w-auto md:h-full md:aspect-[9/16]',
-        showComments ? (isLandscapeFullscreen ? 'scale-100' : '-translate-y-1/4 scale-90') : 'translate-y-0 scale-100',
+        showComments ? (isLandscapeFullscreen ? 'scale-100' : 'translate-y-[-30vh] scale-90') : 'translate-y-0 scale-100',
         animationClass
       )}>
         <video
@@ -170,24 +170,27 @@ export default function ReelPlayer({ reel }: ReelPlayerProps) {
       
       {/* Comments Section */}
       <div className={cn(
-          "absolute bottom-0 left-0 right-0 h-1/2 bg-background p-4 transform transition-transform duration-500 ease-in-out z-20 rounded-t-2xl flex flex-col",
+          "absolute bottom-0 left-0 right-0 h-[40vh] bg-background p-4 transform transition-transform duration-500 ease-in-out z-20 rounded-t-2xl flex flex-col",
+          "md:w-auto md:h-full md:aspect-[9/16]",
           showComments ? 'translate-y-0' : 'translate-y-full',
-          isLandscapeFullscreen ? 'max-w-sm right-0 left-auto' : 'max-w-sm mx-auto'
+          isLandscape 
+              ? (isLandscapeFullscreen ? 'w-full h-full max-w-sm right-0 left-auto' : 'w-full max-w-4xl mx-auto')
+              : 'w-full max-w-md mx-auto md:max-w-none',
       )}>
         <div className="w-full flex-grow flex flex-col overflow-hidden">
             <div className="flex justify-between items-center mb-4 flex-shrink-0">
                 <h3 className="font-headline text-xl">Comments ({comments.length})</h3>
                 <button onClick={() => setShowComments(false)}><X /></button>
             </div>
-             <div className="space-y-4 overflow-y-auto flex-grow mb-4">
+             <div className="space-y-4 overflow-y-auto flex-grow mb-4 pr-2">
                 {comments.map((comment, i) => (
                     <div key={i} className="flex items-start gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback>{comment.author.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <div>
+                        <div className="flex-1 break-words">
                           <p className="font-semibold text-sm">{comment.author}</p>
-                          <p>{comment.text}</p>
+                          <p className="whitespace-pre-wrap">{comment.text}</p>
                         </div>
                     </div>
                 ))}
