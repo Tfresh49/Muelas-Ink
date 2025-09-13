@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import { useEffect, useState } from 'react';
@@ -21,6 +20,7 @@ import RelatedStories from './related-stories';
 import ReadingProgressBar from '@/components/reading-progress-bar';
 import { useToast } from '@/hooks/use-toast';
 import { generateStoryAudio } from '@/ai/flows/story-audio-flow';
+import AudioPlayer from '@/components/audio-player';
 
 
 interface StoryViewProps {
@@ -68,6 +68,11 @@ export default function StoryView({ story }: StoryViewProps) {
         const bookmarkedStories = JSON.parse(localStorage.getItem('bookmarkedStories') || '{}');
         if (bookmarkedStories[story.id]) {
             setIsBookmarked(true);
+        }
+
+        const storedAudio = localStorage.getItem(`audio-${story.id}`);
+        if(storedAudio) {
+            setAudioDataUri(storedAudio);
         }
 
     }, [story.id, story.title]);
@@ -123,10 +128,16 @@ export default function StoryView({ story }: StoryViewProps) {
     };
     
     const handleListen = async () => {
+        if (audioDataUri) {
+            // If we already have audio, just ensure it's visible.
+            // This case might be useful if we decide to hide the player initially.
+            return;
+        }
         setIsGeneratingAudio(true);
         try {
             const response = await generateStoryAudio({ storyContent: story.content });
             setAudioDataUri(response.audioDataUri);
+            localStorage.setItem(`audio-${story.id}`, response.audioDataUri);
         } catch (error) {
             console.error("Failed to generate audio:", error);
             toast({
@@ -245,8 +256,8 @@ export default function StoryView({ story }: StoryViewProps) {
                               </SelectContent>
                           </Select>
                       </div>
-                       <Button onClick={handleListen} disabled={isGeneratingAudio}>
-                            {isGeneratingAudio ? (
+                       <Button onClick={handleListen} disabled={isGeneratingAudio && !audioDataUri}>
+                            {isGeneratingAudio && !audioDataUri ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Generating...
@@ -262,10 +273,7 @@ export default function StoryView({ story }: StoryViewProps) {
 
                      {audioDataUri && (
                         <div className="my-8">
-                            <audio controls className="w-full">
-                                <source src={audioDataUri} type="audio/wav" />
-                                Your browser does not support the audio element.
-                            </audio>
+                           <AudioPlayer src={audioDataUri} storageKey={`audio-progress-${story.id}`} />
                         </div>
                     )}
 
