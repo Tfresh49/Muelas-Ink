@@ -6,6 +6,9 @@ import { ThemeToggle } from "./theme-toggle";
 import { Bell, Menu, PenSquare } from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import Notifications from "./notifications";
+import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
 export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const { toast } = useToast();
@@ -36,10 +39,32 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
             <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Categories</Link>
           </nav>
           <div className="flex items-center gap-2">
-             <Button variant="ghost" size="icon" onClick={showNotifications}>
-                <Bell />
-                <span className="sr-only">Notifications</span>
-            </Button>
+             <div className="hidden md:block">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Bell />
+                    <span className="sr-only">Notifications</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <Notifications />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Bell />
+                    <span className="sr-only">Notifications</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full">
+                  <Notifications />
+                </SheetContent>
+              </Sheet>
+            </div>
             <ThemeToggle />
             <div className="hidden md:block">
               <Button onClick={onMenuClick}>
