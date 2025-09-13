@@ -4,7 +4,7 @@
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import type { Reel } from '@/lib/types';
 import { useRouter } from 'next/navigation';
-import { Heart, MessageCircle, Play, Pause, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { Heart, MessageCircle, Play, Pause, X, ChevronUp, ChevronDown, Maximize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { allReels } from '@/lib/data';
@@ -28,6 +28,8 @@ export default function ReelPlayer({ reel }: ReelPlayerProps) {
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [animationClass, setAnimationClass] = useState('animate-in fade-in');
+  const [isLandscapeFullscreen, setIsLandscapeFullscreen] = useState(false);
+
 
   const lastClickTime = useRef(0);
 
@@ -44,6 +46,7 @@ export default function ReelPlayer({ reel }: ReelPlayerProps) {
   useEffect(() => {
     // Reset animation on new reel
     setAnimationClass('animate-in fade-in');
+    setIsLandscapeFullscreen(false);
   }, [reel.id]);
 
   const handleLike = () => {
@@ -93,18 +96,23 @@ export default function ReelPlayer({ reel }: ReelPlayerProps) {
     }, 300);
   };
 
+  const isLandscape = reel.aspectRatio === 'landscape';
+
   return (
-    <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
+    <div className={cn(
+        "relative w-screen h-screen flex items-center justify-center overflow-hidden",
+        isLandscape && isLandscapeFullscreen ? "bg-black" : ""
+    )}>
       <button onClick={() => router.back()} className="absolute top-4 left-4 z-30 text-white bg-black/50 rounded-full p-2">
         <X className="h-6 w-6" />
       </button>
 
-      {prevReel && (
+      {!isLandscapeFullscreen && prevReel && (
          <Button variant="ghost" size="icon" className="absolute top-1/2 -translate-y-1/2 left-2 z-30 text-white bg-black/30 hover:bg-black/50" onClick={() => navigateToReel(prevReel, 'up')}>
           <ChevronUp className="h-8 w-8" />
         </Button>
       )}
-      {nextReel && (
+      {!isLandscapeFullscreen && nextReel && (
         <Button variant="ghost" size="icon" className="absolute top-1/2 -translate-y-1/2 right-2 z-30 text-white bg-black/30 hover:bg-black/50" onClick={() => navigateToReel(nextReel, 'down')}>
           <ChevronDown className="h-8 w-8" />
         </Button>
@@ -112,9 +120,11 @@ export default function ReelPlayer({ reel }: ReelPlayerProps) {
 
 
       <div className={cn(
-        "relative bg-black rounded-lg overflow-hidden transition-transform duration-500 ease-in-out",
-        reel.aspectRatio === 'portrait' ? 'w-full h-full' : 'w-full max-w-4xl aspect-video',
-        showComments ? '-translate-y-1/4 scale-90' : 'translate-y-0 scale-100',
+        "relative bg-black rounded-lg overflow-hidden transition-all duration-300 ease-in-out",
+        isLandscape 
+            ? (isLandscapeFullscreen ? 'w-full h-full' : 'w-full max-w-4xl aspect-video')
+            : 'w-full h-full md:w-auto md:h-full md:aspect-[9/16]',
+        showComments ? (isLandscapeFullscreen ? 'scale-100' : '-translate-y-1/4 scale-90') : 'translate-y-0 scale-100',
         animationClass
       )}>
         <video
@@ -150,15 +160,21 @@ export default function ReelPlayer({ reel }: ReelPlayerProps) {
                 <MessageCircle className="w-8 h-8" />
                 <span className="font-bold text-sm">{comments.length}</span>
             </button>
+             {isLandscape && (
+                <button onClick={() => setIsLandscapeFullscreen(!isLandscapeFullscreen)} className="flex flex-col items-center gap-1 text-white">
+                    <Maximize className="w-8 h-8" />
+                </button>
+            )}
         </div>
       </div>
       
       {/* Comments Section */}
       <div className={cn(
           "absolute bottom-0 left-0 right-0 h-1/2 bg-background p-4 transform transition-transform duration-500 ease-in-out z-20 rounded-t-2xl flex flex-col",
-          showComments ? 'translate-y-0' : 'translate-y-full'
+          showComments ? 'translate-y-0' : 'translate-y-full',
+          isLandscapeFullscreen ? 'max-w-sm right-0 left-auto' : 'max-w-sm mx-auto'
       )}>
-        <div className="max-w-sm mx-auto w-full flex-grow flex flex-col">
+        <div className="w-full flex-grow flex flex-col">
             <div className="flex justify-between items-center mb-4 flex-shrink-0">
                 <h3 className="font-headline text-xl">Comments ({comments.length})</h3>
                 <button onClick={() => setShowComments(false)}><X /></button>
