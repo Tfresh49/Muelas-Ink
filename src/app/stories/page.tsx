@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { allStories } from '@/lib/data';
 import StoryCard from '@/components/story-card';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Pagination } from '@/components/ui/pagination';
+import { cn } from '@/lib/utils';
 
 const allCategories = ['All', ...Array.from(new Set(allStories.map(story => story.category)))];
 const STORIES_PER_PAGE = 9;
@@ -22,6 +23,25 @@ export default function AllStoriesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSearchVisible, setIsSearchVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current && currentScrollY > 200) {
+        setIsSearchVisible(false); // Scrolling down
+      } else {
+        setIsSearchVisible(true); // Scrolling up
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const filteredStories = useMemo(() => {
     return allStories.filter(story => {
@@ -46,7 +66,7 @@ export default function AllStoriesPage() {
   };
 
   return (
-    <div className="container py-16 md:py-24">
+    <div className="container pt-16 md:pt-24 pb-16">
       <div className="text-center mb-12">
         <h1 className="font-headline text-4xl md:text-5xl font-bold mb-2">All Stories</h1>
         <p className="text-muted-foreground max-w-xl mx-auto">
@@ -54,33 +74,38 @@ export default function AllStoriesPage() {
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-8 justify-center">
-        <div className="relative w-full md:max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search stories..."
-            className="pl-10 h-12"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1); // Reset to first page on search
-            }}
-          />
+      <div className={cn(
+        "sticky top-16 z-40 bg-background/80 backdrop-blur-sm transition-all duration-300 py-4 mb-8",
+        isSearchVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+      )}>
+        <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <div className="relative w-full md:max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+                type="search"
+                placeholder="Search stories..."
+                className="pl-10 h-12"
+                value={searchQuery}
+                onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1); // Reset to first page on search
+                }}
+            />
+            </div>
+            <Select value={selectedCategory} onValueChange={(value) => {
+            setSelectedCategory(value);
+            setCurrentPage(1); // Reset to first page on category change
+            }}>
+            <SelectTrigger className="w-full md:w-[180px] h-12">
+                <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+                {allCategories.map(category => (
+                <SelectItem key={category} value={category}>{category}</SelectItem>
+                ))}
+            </SelectContent>
+            </Select>
         </div>
-        <Select value={selectedCategory} onValueChange={(value) => {
-          setSelectedCategory(value);
-          setCurrentPage(1); // Reset to first page on category change
-        }}>
-          <SelectTrigger className="w-full md:w-[180px] h-12">
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            {allCategories.map(category => (
-              <SelectItem key={category} value={category}>{category}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
       
       {storiesToShow.length > 0 ? (
