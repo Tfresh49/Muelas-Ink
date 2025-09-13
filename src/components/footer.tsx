@@ -51,8 +51,9 @@ export function Footer() {
           </div>
           <div className="space-y-4 text-center md:text-left col-span-1 md:col-span-2 lg:col-span-1">
              <div className="space-y-4">
-                <p>So what do you think about this sample website? Though this one is just the startup preview, on real site you'll be able to manage your stories and add pricings in the future.</p>
-                <Button onClick={showCoffeeToast}>Buy me a coffee</Button>
+                <h3 className="font-headline text-lg font-bold">Support Us</h3>
+                <p>If you enjoy the stories, consider supporting the authors.</p>
+                <Button onClick={showCoffeeToast}>Buy us a coffee</Button>
              </div>
           </div>
         </div>

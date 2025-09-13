@@ -30,10 +30,10 @@ export default function Home() {
       <section className="py-16 md:py-24 text-center bg-secondary">
         <div className="container">
           <h1 className="font-headline text-4xl md:text-6xl font-bold mb-4">
-            This is a demo stories sharing site
+            Discover Worlds, One Story at a Time
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            So this is what the website might look like to your readers
+            A universe of captivating tales from talented authors awaits. Find your next favorite story and start your adventure today.
           </p>
           <div className="flex gap-4 justify-center">
             <Button asChild size="lg">
