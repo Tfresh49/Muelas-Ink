@@ -82,3 +82,14 @@ export type FeedItem = {
     likes: number;
     commentsCount: number;
 };
+
+export type Podcast = {
+  id: string;
+  title: string;
+  description: string;
+  audioSrc: string;
+  imageUrl: string;
+  isLive: boolean;
+  category: string;
+  author: string;
+};

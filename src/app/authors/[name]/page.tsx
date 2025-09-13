@@ -14,6 +14,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { allFeedItems } from '@/lib/feeds-data';
 import AudioPlayer from '@/components/audio-player';
+import { allPodcasts } from '@/lib/podcasts-data';
 
 interface AuthorPageProps {
   params: {
@@ -61,21 +62,23 @@ const FeedItemCard = ({ item }: { item: typeof allFeedItems[0] }) => (
     </Link>
 );
 
-const PodcastItem = ({ title, description, audioSrc, imageUrl }: { title: string, description: string, audioSrc: string, imageUrl: string }) => (
-    <Card className="overflow-hidden">
+const PodcastItem = ({ podcast }: { podcast: typeof allPodcasts[0] }) => (
+    <Link href={`/podcasts/${podcast.id}`} className="block">
+    <Card className="overflow-hidden transition-all hover:shadow-md hover:border-primary/50">
         <div className="flex flex-col md:flex-row">
             <div className="relative w-full md:w-1/3 aspect-square">
-                <Image src={imageUrl} alt={title} fill className="object-cover" data-ai-hint="podcast cover" />
+                <Image src={podcast.imageUrl} alt={podcast.title} fill className="object-cover" data-ai-hint="podcast cover" />
             </div>
             <div className="md:w-2/3 p-6 flex flex-col justify-between">
                 <div>
-                    <h3 className="font-headline text-2xl mb-2">{title}</h3>
-                    <p className="text-muted-foreground mb-4">{description}</p>
+                    <h3 className="font-headline text-xl mb-2">{podcast.title}</h3>
+                    <p className="text-muted-foreground mb-4 line-clamp-3">{podcast.description}</p>
                 </div>
-                <AudioPlayer src={audioSrc} />
+                 <Button variant="link" className="p-0 justify-start">View Episode</Button>
             </div>
         </div>
     </Card>
+    </Link>
 );
 
 const EventItem = ({ event }: { event: typeof allEvents[0] }) => (
@@ -113,6 +116,7 @@ export default function AuthorPage({ params }: AuthorPageProps) {
   const authorReels = allReels.filter(r => r.authorSlug === author.urlSlug);
   const authorEvents = allEvents;
   const authorFeed = allFeedItems.filter(f => f.authorSlug === author.urlSlug);
+  const authorPodcasts = allPodcasts.filter(p => p.author === author.name);
 
   return (
     <div className="container py-16 md:py-24">
@@ -157,18 +161,9 @@ export default function AuthorPage({ params }: AuthorPageProps) {
                    ))}
                 </TabsContent>
                 <TabsContent value="podcasts" className="mt-8 max-w-3xl mx-auto space-y-8">
-                    <PodcastItem 
-                        title="Episode 5: World-Building Workshop"
-                        description="Join me as I discuss my process for creating immersive fantasy worlds, from drawing maps to developing cultures and magic systems."
-                        audioSrc="http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3"
-                        imageUrl="https://picsum.photos/seed/podcast1/600/600"
-                    />
-                    <PodcastItem 
-                        title="Episode 4: The Art of the Anti-Hero"
-                        description="A deep dive into creating complex, morally grey characters that readers can't help but root for. Featuring a special guest!"
-                        audioSrc="http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/sonorous.mp3"
-                        imageUrl="https://picsum.photos/seed/podcast2/600/600"
-                    />
+                    {authorPodcasts.map(podcast => (
+                        <PodcastItem key={podcast.id} podcast={podcast} />
+                    ))}
                 </TabsContent>
                 <TabsContent value="events" className="mt-8 max-w-3xl mx-auto space-y-8">
                     {authorEvents.map(event => (

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Play, Pause, FastForward, Rewind, ChevronsUp, ChevronsDown } from 'lucide-react';
+import { Play, Pause, FastForward, Rewind, ChevronsUp, ChevronsDown, Volume2, VolumeX } from 'lucide-react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -11,30 +11,34 @@ interface AudioPlayerProps {
   src: string;
   // If provided, the player will save and restore its progress from localStorage
   storageKey?: string;
+  isLive?: boolean;
 }
 
 const formatTime = (seconds: number) => {
+  if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
   const floored = Math.floor(seconds);
   const min = Math.floor(floored / 60);
   const sec = floored % 60;
   return `${min}:${sec < 10 ? '0' : ''}${sec}`;
 };
 
-export default function AudioPlayer({ src, storageKey }: AudioPlayerProps) {
+export default function AudioPlayer({ src, storageKey, isLive = false }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isSeeking, setIsSeeking] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
   
   const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const saveProgress = useCallback(() => {
-    if (storageKey && audioRef.current) {
+    if (storageKey && audioRef.current && !isLive) {
         localStorage.setItem(storageKey, audioRef.current.currentTime.toString());
     }
-  }, [storageKey]);
+  }, [storageKey, isLive]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -42,7 +46,7 @@ export default function AudioPlayer({ src, storageKey }: AudioPlayerProps) {
 
     const setAudioData = () => {
       setDuration(audio.duration);
-      if (storageKey) {
+      if (storageKey && !isLive) {
         const savedTime = localStorage.getItem(storageKey);
         if (savedTime) {
           const time = parseFloat(savedTime);
@@ -65,7 +69,7 @@ export default function AudioPlayer({ src, storageKey }: AudioPlayerProps) {
 
     // Save progress periodically
     audio.addEventListener('play', () => {
-        if (storageKey) {
+        if (storageKey && !isLive) {
             saveIntervalRef.current = setInterval(saveProgress, 2000);
         }
     });
@@ -88,7 +92,13 @@ export default function AudioPlayer({ src, storageKey }: AudioPlayerProps) {
             clearInterval(saveIntervalRef.current);
         }
     };
-  }, [src, storageKey, saveProgress]);
+  }, [src, storageKey, saveProgress, isLive]);
+  
+   useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
 
   const togglePlayPause = () => {
     if (audioRef.current) {
@@ -128,15 +138,36 @@ export default function AudioPlayer({ src, storageKey }: AudioPlayerProps) {
           setPlaybackRate(rate);
       }
   }
-  
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  if(isLive) {
+    return (
+       <div className="w-full bg-secondary p-4 rounded-lg flex flex-col gap-2">
+          <audio ref={audioRef} src={src} preload="metadata" autoPlay />
+          <div className="flex items-center gap-4">
+             <Button size="icon" variant="ghost" onClick={togglePlayPause}>
+                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 fill-current" />}
+            </Button>
+            <div className="flex-grow flex items-center gap-4">
+                <div className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">LIVE</div>
+                <div className="text-sm font-medium">Live Broadcast</div>
+            </div>
+            <div className="flex items-center gap-2 w-32">
+                <Button size="icon" variant="ghost" onClick={() => setIsMuted(!isMuted)}>
+                    {isMuted || volume === 0 ? <VolumeX className="w-5 h-5"/> : <Volume2 className="w-5 h-5"/>}
+                </Button>
+                <Slider value={[isMuted ? 0 : volume]} max={1} step={0.05} onValueChange={(v) => { setIsMuted(false); setVolume(v[0]); }}/>
+            </div>
+          </div>
+       </div>
+    )
+  }
 
   return (
     <div className="w-full bg-secondary p-4 rounded-lg flex flex-col gap-2">
       <audio ref={audioRef} src={src} preload="metadata" />
       
       <div className="flex items-center gap-4">
-        <Button size="icon" variant="ghost" onClick={togglePlayPause}>
+        <Button size="icon" variant="ghost" onClick={togglePlayPause} disabled={isLive}>
           {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 fill-current" />}
         </Button>
         <div className="flex-grow flex items-center gap-2">
@@ -147,19 +178,20 @@ export default function AudioPlayer({ src, storageKey }: AudioPlayerProps) {
                 step={1}
                 onValueChange={handleSeek}
                 onValueCommit={handleSeekCommit}
+                disabled={isLive}
             />
             <span className="text-xs font-mono">{formatTime(duration)}</span>
         </div>
       </div>
 
       <div className="flex justify-center items-center gap-2">
-          <Button size="icon" variant="ghost" onClick={() => handleSkip(-10)}>
+          <Button size="icon" variant="ghost" onClick={() => handleSkip(-10)} disabled={isLive}>
             <Rewind className="w-5 h-5" />
           </Button>
 
           <Popover>
             <PopoverTrigger asChild>
-                <Button variant="ghost" className="w-20">
+                <Button variant="ghost" className="w-20" disabled={isLive}>
                     {playbackRate}x
                 </Button>
             </PopoverTrigger>
@@ -179,7 +211,7 @@ export default function AudioPlayer({ src, storageKey }: AudioPlayerProps) {
             </PopoverContent>
           </Popover>
 
-          <Button size="icon" variant="ghost" onClick={() => handleSkip(10)}>
+          <Button size="icon" variant="ghost" onClick={() => handleSkip(10)} disabled={isLive}>
             <FastForward className="w-5 h-5" />
           </Button>
       </div>
