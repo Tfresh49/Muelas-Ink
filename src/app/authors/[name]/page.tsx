@@ -64,7 +64,7 @@ const PodcastItem = ({ title, description, audioSrc, imageUrl }: { title: string
     </Card>
 );
 
-const EventItem = ({ date, title, location, description }: { date: { day: string, month: string }, title: string, location: string, description: string }) => (
+const EventItem = ({ date, title, location, description }: { date: { day: string, month: string }, title: string, location: string, description:string }) => (
     <Card className="flex flex-col md:flex-row">
         <div className="bg-secondary p-6 flex flex-col items-center justify-center rounded-t-lg md:rounded-l-lg md:rounded-t-none">
             <span className="font-headline text-4xl text-primary">{date.day}</span>
@@ -130,19 +130,26 @@ export default function AuthorPage({ params }: AuthorPageProps) {
                             ))}
                         </div>
                     ) : (
-                        <PlaceholderContent title="Author Reels" icon={Clapperboard} />
+                        <PlaceholderContent title="No Reels Yet" icon={Clapperboard} />
                     )}
                 </TabsContent>
                 <TabsContent value="feed" className="mt-8 max-w-2xl mx-auto space-y-8">
                    <FeedItem author={author.name} time="2 hours ago" content="Just finished the final chapter of my next book! It's been a long journey, but I can't wait for you all to read it. #amwriting #newbook" />
                    <FeedItem author={author.name} time="1 day ago" content="Finding inspiration in the most unexpected places. This misty morning view is definitely going into a story." imageUrl="https://picsum.photos/seed/feed1/800/450" />
+                   <FeedItem author={author.name} time="3 days ago" content="Thank you all for the amazing feedback on 'Emberwing'! It means the world to me that the story is resonating with so many of you." />
                 </TabsContent>
-                <TabsContent value="podcasts" className="mt-8 max-w-3xl mx-auto">
+                <TabsContent value="podcasts" className="mt-8 max-w-3xl mx-auto space-y-8">
                     <PodcastItem 
                         title="Episode 5: World-Building Workshop"
                         description="Join me as I discuss my process for creating immersive fantasy worlds, from drawing maps to developing cultures and magic systems."
                         audioSrc="http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3"
                         imageUrl="https://picsum.photos/seed/podcast1/600/600"
+                    />
+                    <PodcastItem 
+                        title="Episode 4: The Art of the Anti-Hero"
+                        description="A deep dive into creating complex, morally grey characters that readers can't help but root for. Featuring a special guest!"
+                        audioSrc="http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/sonorous.mp3"
+                        imageUrl="https://picsum.photos/seed/podcast2/600/600"
                     />
                 </TabsContent>
                 <TabsContent value="events" className="mt-8 max-w-3xl mx-auto space-y-8">
