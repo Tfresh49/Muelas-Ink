@@ -15,17 +15,26 @@ import {
 } from '@/components/ui/select';
 import { Pagination } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
+import { useSearchParams } from 'next/navigation';
 
 const allCategories = ['All', ...Array.from(new Set(allStories.map(story => story.category)))];
 const STORIES_PER_PAGE = 9;
 
 export default function AllStoriesPage() {
+  const searchParams = useSearchParams();
+  const tagFromQuery = searchParams.get('tag');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedTag, setSelectedTag] = useState<string | null>(tagFromQuery);
   const [currentPage, setCurrentPage] = useState(1);
   const [isSearchVisible, setIsSearchVisible] = useState(true);
   const lastScrollY = useRef(0);
 
+  useEffect(() => {
+    setSelectedTag(tagFromQuery);
+    setCurrentPage(1);
+  }, [tagFromQuery]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,9 +57,10 @@ export default function AllStoriesPage() {
       const matchesCategory = selectedCategory === 'All' || story.category === selectedCategory;
       const matchesSearch = story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             story.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+      const matchesTag = !selectedTag || story.tags.includes(selectedTag);
+      return matchesCategory && matchesSearch && matchesTag;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, selectedTag]);
 
   const totalPages = Math.ceil(filteredStories.length / STORIES_PER_PAGE);
 
@@ -72,6 +82,12 @@ export default function AllStoriesPage() {
         <p className="text-muted-foreground max-w-xl mx-auto">
           Browse through our entire collection of tales. Use the filters below to find your next favorite read.
         </p>
+        {selectedTag && (
+          <div className="mt-4">
+            <span className="text-muted-foreground">Filtered by tag: </span>
+            <span className="font-semibold text-primary">{selectedTag}</span>
+          </div>
+        )}
       </div>
 
       <div className={cn(

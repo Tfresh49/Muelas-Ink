@@ -84,7 +84,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           <h3 className="font-headline text-lg font-semibold mb-2">Hot Tags</h3>
           <div className="flex flex-wrap gap-2 mb-6">
             {hotTags.map(tag => (
-              <Badge key={tag} variant="secondary" className="cursor-pointer hover:bg-muted">{tag}</Badge>
+              <Link key={tag} href={`/stories?tag=${tag}`} passHref>
+                  <Badge variant="secondary" className="cursor-pointer hover:bg-muted">{tag}</Badge>
+              </Link>
             ))}
           </div>
 
