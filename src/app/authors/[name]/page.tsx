@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { allFeedItems } from '@/lib/feeds-data';
+import AudioPlayer from '@/components/audio-player';
 
 interface AuthorPageProps {
   params: {
@@ -71,10 +72,7 @@ const PodcastItem = ({ title, description, audioSrc, imageUrl }: { title: string
                     <h3 className="font-headline text-2xl mb-2">{title}</h3>
                     <p className="text-muted-foreground mb-4">{description}</p>
                 </div>
-                <audio controls className="w-full">
-                    <source src={audioSrc} type="audio/mpeg" />
-                    Your browser does not support the audio element.
-                </audio>
+                <AudioPlayer src={audioSrc} />
             </div>
         </div>
     </Card>
