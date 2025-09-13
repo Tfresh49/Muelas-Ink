@@ -24,7 +24,7 @@ const formatTime = (seconds: number) => {
 
 export default function AudioPlayer({ src, storageKey, isLive = false }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(isLive);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
@@ -39,6 +39,18 @@ export default function AudioPlayer({ src, storageKey, isLive = false }: AudioPl
         localStorage.setItem(storageKey, audioRef.current.currentTime.toString());
     }
   }, [storageKey, isLive]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isLive) {
+      audio.muted = isMuted;
+    } else {
+      audio.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted, isLive]);
+
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -94,12 +106,6 @@ export default function AudioPlayer({ src, storageKey, isLive = false }: AudioPl
     };
   }, [src, storageKey, saveProgress, isLive]);
   
-   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-    }
-  }, [volume, isMuted]);
-
   const togglePlayPause = () => {
     if (audioRef.current) {
       if (isPlaying) {
@@ -138,21 +144,28 @@ export default function AudioPlayer({ src, storageKey, isLive = false }: AudioPl
           setPlaybackRate(rate);
       }
   }
+  
+  const toggleMute = () => {
+      setIsMuted(!isMuted);
+      if (audioRef.current) {
+        audioRef.current.muted = !isMuted;
+      }
+  }
 
   if(isLive) {
     return (
        <div className="w-full bg-secondary p-4 rounded-lg flex flex-col gap-2">
           <audio ref={audioRef} src={src} preload="metadata" autoPlay />
           <div className="flex items-center gap-4">
-             <Button size="icon" variant="ghost" onClick={togglePlayPause}>
-                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 fill-current" />}
+             <Button size="icon" variant="ghost" onClick={toggleMute}>
+                {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
             </Button>
             <div className="flex-grow flex items-center gap-4">
                 <div className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">LIVE</div>
                 <div className="text-sm font-medium">Live Broadcast</div>
             </div>
-            <div className="flex items-center gap-2 w-32">
-                <Button size="icon" variant="ghost" onClick={() => setIsMuted(!isMuted)}>
+             <div className="flex items-center gap-2 w-32">
+                <Button size="icon" variant="ghost" onClick={toggleMute}>
                     {isMuted || volume === 0 ? <VolumeX className="w-5 h-5"/> : <Volume2 className="w-5 h-5"/>}
                 </Button>
                 <Slider value={[isMuted ? 0 : volume]} max={1} step={0.05} onValueChange={(v) => { setIsMuted(false); setVolume(v[0]); }}/>
