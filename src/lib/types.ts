@@ -30,3 +30,14 @@ export type Author = {
     avatarUrl: string;
     bio: string;
 }
+
+export type Reel = {
+  id: string;
+  authorSlug: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  caption: string;
+  likes: number;
+  comments: { author: string; text: string }[];
+  aspectRatio: 'portrait' | 'landscape';
+};

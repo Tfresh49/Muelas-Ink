@@ -1,10 +1,11 @@
 
-import { allAuthors, allStories } from '@/lib/data';
+import { allAuthors, allStories, allReels } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import StoryCard from '@/components/story-card';
 import AuthorCard from '@/components/author-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Rss, Clapperboard, Mic, Calendar } from 'lucide-react';
+import ReelCard from '@/components/reel-card';
 
 interface AuthorPageProps {
   params: {
@@ -29,6 +30,7 @@ export default function AuthorPage({ params }: AuthorPageProps) {
   }
 
   const authorStories = allStories.filter(s => s.authorSlug === author.urlSlug);
+  const authorReels = allReels.filter(r => r.authorSlug === author.urlSlug);
 
   return (
     <div className="container py-16 md:py-24">
@@ -38,8 +40,8 @@ export default function AuthorPage({ params }: AuthorPageProps) {
             <Tabs defaultValue="stories" className="w-full">
                 <TabsList className="grid w-full grid-cols-5">
                     <TabsTrigger value="stories">Stories ({authorStories.length})</TabsTrigger>
+                    <TabsTrigger value="reels">Reels ({authorReels.length})</TabsTrigger>
                     <TabsTrigger value="feed"><Rss className="mr-2" /> Feed</TabsTrigger>
-                    <TabsTrigger value="reels"><Clapperboard className="mr-2" /> Reels</TabsTrigger>
                     <TabsTrigger value="podcasts"><Mic className="mr-2" /> Podcasts</TabsTrigger>
                     <TabsTrigger value="events"><Calendar className="mr-2" /> Events</TabsTrigger>
                 </TabsList>
@@ -56,11 +58,19 @@ export default function AuthorPage({ params }: AuthorPageProps) {
                         </div>
                     )}
                 </TabsContent>
+                 <TabsContent value="reels" className="mt-8">
+                    {authorReels.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            {authorReels.map(reel => (
+                                <ReelCard key={reel.id} reel={reel} />
+                            ))}
+                        </div>
+                    ) : (
+                        <PlaceholderContent title="Author Reels" icon={Clapperboard} />
+                    )}
+                </TabsContent>
                 <TabsContent value="feed">
                     <PlaceholderContent title="Author Feed" icon={Rss} />
-                </TabsContent>
-                <TabsContent value="reels">
-                     <PlaceholderContent title="Author Reels" icon={Clapperboard} />
                 </TabsContent>
                 <TabsContent value="podcasts">
                     <PlaceholderContent title="Author Podcasts" icon={Mic} />

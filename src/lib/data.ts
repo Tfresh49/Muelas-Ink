@@ -1,5 +1,5 @@
 
-import type { Story, Comment, Author } from './types';
+import type { Story, Comment, Author, Reel } from './types';
 
 export const allAuthors: Author[] = [
     {
@@ -9,6 +9,45 @@ export const allAuthors: Author[] = [
         bio: 'Elara Vance is a renowned storyteller, weaving tales of magic, mystery, and adventure that transport readers to other worlds. With a passion for creating rich, immersive narratives, Elara has captivated audiences with epics like "The Whispering Woods" and "Emberwing".'
     }
 ];
+
+export const allReels: Reel[] = [
+  {
+    id: 'reel-1',
+    authorSlug: 'elara-vance',
+    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    thumbnailUrl: 'https://picsum.photos/seed/reel1/300/500',
+    caption: 'A look behind the scenes of my writing process! 📝 #authorlife',
+    likes: 1250,
+    comments: [
+      { author: 'Reader_1', text: 'So cool to see this!' },
+      { author: 'FanGirl_99', text: 'Love your workspace! ❤️' },
+    ],
+    aspectRatio: 'portrait',
+  },
+  {
+    id: 'reel-2',
+    authorSlug: 'elara-vance',
+    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    thumbnailUrl: 'https://picsum.photos/seed/reel2/500/300',
+    caption: 'Talking about the inspiration for The Whispering Woods.',
+    likes: 3400,
+    comments: [
+      { author: 'Bookworm_88', text: 'Fascinating! ' },
+    ],
+    aspectRatio: 'landscape',
+  },
+    {
+    id: 'reel-3',
+    authorSlug: 'elara-vance',
+    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    thumbnailUrl: 'https://picsum.photos/seed/reel3/300/500',
+    caption: 'My favorite reading spot on a rainy day.',
+    likes: 890,
+    comments: [],
+    aspectRatio: 'portrait',
+  },
+];
+
 
 export const allStories: Story[] = [
   {
