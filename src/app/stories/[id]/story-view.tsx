@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { useEffect, useState } from 'react';
@@ -156,7 +157,7 @@ export default function StoryView({ story }: StoryViewProps) {
                             {story.title}
                         </h1>
                         <div className="flex items-center gap-2 text-lg text-muted-foreground mt-4">
-                           <Link href="#" className="flex items-center gap-2 hover:text-primary">
+                           <Link href={`/authors/${story.authorSlug}`} className="flex items-center gap-2 hover:text-primary">
                              <UserCircle className="h-6 w-6" />
                              <span>{story.author}</span>
                            </Link>
@@ -295,4 +296,5 @@ export default function StoryView({ story }: StoryViewProps) {
     );
 
     
+
 

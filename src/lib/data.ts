@@ -1,10 +1,21 @@
-import type { Story, Comment } from './types';
+
+import type { Story, Comment, Author } from './types';
+
+export const allAuthors: Author[] = [
+    {
+        name: 'Elara Vance',
+        urlSlug: 'elara-vance',
+        avatarUrl: 'https://picsum.photos/seed/301/200/200',
+        bio: 'Elara Vance is a renowned storyteller, weaving tales of magic, mystery, and adventure that transport readers to other worlds. With a passion for creating rich, immersive narratives, Elara has captivated audiences with epics like "The Whispering Woods" and "Emberwing".'
+    }
+];
 
 export const allStories: Story[] = [
   {
     id: 'the-whispering-woods',
     title: 'The Whispering Woods',
     author: 'Elara Vance',
+    authorSlug: 'elara-vance',
     excerpt: 'An ancient forest that communicates through the rustling of its leaves holds a secret that could change the world.',
     content: `In the heart of Aerthos, the Whispering Woods was a place of legend. They said the trees were sentient, their leaves susurrating ancient truths to those who knew how to listen. Lyra, a young botanist with an uncanny connection to nature, was determined to understand their language. Armed with her grandfather's journal, she ventured into the shimmering, emerald gloom. The air grew thick with unspoken words, and the light filtered through the canopy in shifting patterns that seemed to form glyphs. It was here she discovered that the Woods were not just whispering secrets of the past, but prophesying a looming darkness that only she could prevent. The fate of Aerthos rested on her ability to translate the leafy whispers into a call to action.`,
     category: 'Fantasy',
@@ -19,6 +30,7 @@ export const allStories: Story[] = [
     id: 'chronos-echo',
     title: 'Chronos\' Echo',
     author: 'Elara Vance',
+    authorSlug: 'elara-vance',
     excerpt: 'In the neon-drenched metropolis of Neo-Veridia, a data-heist goes wrong, sending a cynical hacker through time.',
     content: `Kaelen was the best net-runner in the underbelly of Neo-Veridia. His latest job: stealing corporate secrets from Chronos Corp. But when he jacked in, a surge of energy threw his consciousness back 20 years. Trapped in a past he only knew from history vids, Kaelen must navigate a less-connected world to find a way back. His only clue is a digital echo, a ghost of the Chronos program that brought him here. He soon realizes he wasn't sent back by accident. He has a chance to stop the very corporation he was robbing from ever rising to power, but meddling with time has consequences he can't possibly foresee.`,
     category: 'Sci-Fi',
@@ -33,6 +45,7 @@ export const allStories: Story[] = [
     id: 'the-sunken-star',
     title: 'The Sunken Star',
     author: 'Elara Vance',
+    authorSlug: 'elara-vance',
     excerpt: 'A mysterious monolith discovered in the deepest ocean trench begins to emit a signal that resonates with ancient myths.',
     content: `The Mariana Trench held its secrets close, but the crew of the submersible 'Triton' was about to uncover its greatest one. Dr. Aris Thorne and his team discovered an impossible structure: a perfectly smooth, obsidian monolith humming with a faint energy. Dubbed 'The Sunken Star', its discovery sent shockwaves through the scientific community. As they studied it, the monolith began broadcasting a complex signal, a song that mirrored the creation myths of civilizations long dead. Aris realizes they haven't found a rock; they've found a Rosetta Stone for the universe, a message from the dawn of time that could either be humanity's salvation or its final epitaph.`,
     category: 'Sci-Fi',
@@ -47,6 +60,7 @@ export const allStories: Story[] = [
     id: 'emberwing',
     title: 'Emberwing',
     author: 'Elara Vance',
+    authorSlug: 'elara-vance',
     excerpt: 'In a world ruled by dragon-riders, a young stable hand forms an unlikely bond with a supposedly untamable dragon.',
     content: `From the Dragon Peaks of Drakoria, the elite Dragon Guard kept the peace. For Finn, a lowly stable hand, riding a dragon was a distant dream. He spent his days tending to the mighty beasts, never imagining he would bond with one. But Emberwing was different. Feared for his volcanic temper and scarred hide, no rider had ever been able to tame him. Yet, Finn saw not a monster, but a kindred, lonely spirit. A secret friendship bloomed in the shadows of the stables, a bond that would be tested when a forgotten evil rises from the south, threatening the very heart of Drakoria. Finn and Emberwing, the outcast boy and the untamable dragon, may be the kingdom's only hope.`,
     category: 'Fantasy',
@@ -61,6 +75,7 @@ export const allStories: Story[] = [
     id: 'void-drifter',
     title: 'Void Drifter',
     author: 'Elara Vance',
+    authorSlug: 'elara-vance',
     excerpt: 'The last human alive pilots a ramshackle starship through the silent ruins of a galactic civilization, searching for answers.',
     content: `Centuries after 'The Silence' fell and every other human vanished in a flash of light, Zara is alone. She drifts through the cosmic graveyard of a once-thriving galaxy in her ship, 'The Wanderer'. Accompanied only by the ship's quirky AI, she follows the faint energy trails left by The Silence, a breadcrumb trail she hopes will lead to an explanation. Her journey takes her to awe-inspiring and terrifying worlds, abandoned by races far older than her own, all victims of the same phenomenon. Each discovery adds a piece to the puzzle of what happened to her people, and whether she is truly the last one left.`,
     category: 'Sci-Fi',
@@ -75,6 +90,7 @@ export const allStories: Story[] = [
     id: 'the-archivist-of-souls',
     title: 'The Archivist of Souls',
     author: 'Elara Vance',
+    authorSlug: 'elara-vance',
     excerpt: 'A librarian in a magical library that contains the life stories of every person, living or dead, finds a book that is still being written.',
     content: `The Great Library of Alexandria was a pale imitation of the Scriptorium, a place outside of time and space where every life is a book on a shelf. Elias is an Archivist, a guardian of these stories. His duty is to preserve, never to read. But one day, a new book appears, its vellum cover still warm, its ink still wet. It is the story of a young woman in the living world whose life is on a path to catastrophe. Breaking his most sacred vow, Elias begins to read, and discovers he might be able to leave notes in the margins, nudges that could alter her fate. But changing a story is a perilous act, and the Librarians who came before him have long warned of the consequences.`,
     category: 'Fantasy',
