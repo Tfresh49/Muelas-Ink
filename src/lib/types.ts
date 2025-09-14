@@ -1,12 +1,24 @@
 
 
+export type Episode = {
+  id: string;
+  title: string;
+  content: string;
+};
+
+export type Season = {
+  id: string;
+  title: string;
+  episodes: Episode[];
+};
+
 export type Story = {
   id: string;
   title: string;
   author: string;
   authorSlug: string;
   excerpt: string;
-  content: string;
+  seasons: Season[];
   category: string;
   tags: string[];
   imageUrl: string;

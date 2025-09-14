@@ -1,7 +1,7 @@
 
 import { collection, addDoc, getDocs, doc, deleteDoc, serverTimestamp, query } from "firebase/firestore"; 
 import { firestore } from '@/lib/firebase';
-import type { Story } from './types';
+import type { Story, Season } from './types';
 
 // NOTE: This is a placeholder author slug. In a real application,
 // this would be dynamically assigned based on the logged-in author.

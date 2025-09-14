@@ -60,23 +60,29 @@ export default function StoryView({ story }: StoryViewProps) {
     const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
     const [selectedVoice, setSelectedVoice] = useState(voiceDisplayNames[0]);
     const [showPaywall, setShowPaywall] = useState(false);
+    
+    const [activeSeasonIndex, setActiveSeasonIndex] = useState(0);
+    const [activeEpisodeIndex, setActiveEpisodeIndex] = useState(0);
 
     const router = useRouter();
     const { toast } = useToast();
     const { isAuthenticated } = useAuth();
     
-    const getAudioStorageKey = (voice: string) => `audio-${story.id}-${voice}`;
+    const activeEpisode = story.seasons?.[activeSeasonIndex]?.episodes?.[activeEpisodeIndex];
+    const storyContent = activeEpisode?.content || 'This episode is empty.';
+
+    const getAudioStorageKey = (voice: string) => `audio-${story.id}-${activeSeasonIndex}-${activeEpisodeIndex}-${voice}`;
 
     useEffect(() => {
         const hasHadFirstRead = localStorage.getItem('hasHadFirstRead');
 
         if (!isAuthenticated && hasHadFirstRead) {
             setShowPaywall(true);
-        } else {
-            localStorage.setItem('hasHadFirstRead', 'true');
+        } else if (!showPaywall) {
+             localStorage.setItem('hasHadFirstRead', 'true');
         }
 
-        const history = JSON.parse(localStorage.getItem('readingHistory') || '[]').join(', ');
+        const history = JSON.parse(localStorage.getItem('readingHistory') || '[]');
         if (!history.includes(story.title)) {
             const newHistory = [...history, story.title];
             localStorage.setItem('readingHistory', JSON.stringify(newHistory.slice(-10))); // Limit history size
@@ -99,7 +105,7 @@ export default function StoryView({ story }: StoryViewProps) {
             setAudioDataUri(null);
         }
 
-    }, [story.id, story.title, selectedVoice, isAuthenticated]);
+    }, [story.id, story.title, selectedVoice, isAuthenticated, activeSeasonIndex, activeEpisodeIndex, showPaywall]);
 
     const handleLike = () => {
       const likedStories = JSON.parse(localStorage.getItem('likedStories') || '{}');
@@ -168,6 +174,14 @@ export default function StoryView({ story }: StoryViewProps) {
             });
             return;
         }
+        if (!storyContent || storyContent === 'This episode is empty.') {
+            toast({
+                title: "Empty Content",
+                description: "There is no content in this episode to generate audio for.",
+                variant: "destructive",
+            });
+            return;
+        }
         const cachedAudio = localStorage.getItem(getAudioStorageKey(selectedVoice));
         if (cachedAudio) {
             setAudioDataUri(cachedAudio);
@@ -177,7 +191,7 @@ export default function StoryView({ story }: StoryViewProps) {
         setIsGeneratingAudio(true);
         try {
             const voiceName = voiceOptions[selectedVoice];
-            const response = await generateStoryAudio({ storyContent: story.content, voiceName });
+            const response = await generateStoryAudio({ storyContent: storyContent, voiceName });
             setAudioDataUri(response.audioDataUri);
             localStorage.setItem(getAudioStorageKey(selectedVoice), response.audioDataUri);
         } catch (error) {
@@ -277,18 +291,28 @@ export default function StoryView({ story }: StoryViewProps) {
                     </div>
 
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 my-8">
-                        <div className="w-full sm:w-auto">
-                            <Select defaultValue="1">
-                                <SelectTrigger>
+                       <div className="flex items-center gap-2">
+                            <Select value={String(activeSeasonIndex)} onValueChange={value => { setActiveSeasonIndex(Number(value)); setActiveEpisodeIndex(0); }}>
+                                <SelectTrigger className="w-[150px]">
+                                    <SelectValue placeholder="Season" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {story.seasons?.map((season, index) => (
+                                        <SelectItem key={season.id} value={String(index)}>{season.title}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                             <Select value={String(activeEpisodeIndex)} onValueChange={value => setActiveEpisodeIndex(Number(value))}>
+                                <SelectTrigger className="w-[150px]">
                                     <SelectValue placeholder="Episode" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="1">Ep. 1: The Beginning</SelectItem>
-                                    <SelectItem value="2">Ep. 2: The Middle</SelectItem>
-                                    <SelectItem value="3">Ep. 3: The End</SelectItem>
+                                    {story.seasons?.[activeSeasonIndex]?.episodes.map((episode, index) => (
+                                        <SelectItem key={episode.id} value={String(index)}>{episode.title}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
-                        </div>
+                       </div>
 
                       <div className="flex flex-col sm:flex-row items-center gap-2">
                           <Select onValueChange={setSelectedVoice} value={selectedVoice}>
@@ -319,7 +343,7 @@ export default function StoryView({ story }: StoryViewProps) {
 
                      {audioDataUri && (
                         <div className="my-8">
-                           <AudioPlayer src={audioDataUri} storageKey={`tts-progress-${story.id}`} />
+                           <AudioPlayer src={audioDataUri} storageKey={`tts-progress-${story.id}-${activeSeasonIndex}-${activeEpisodeIndex}`} />
                         </div>
                     )}
 
@@ -347,7 +371,7 @@ export default function StoryView({ story }: StoryViewProps) {
                                 "prose prose-lg dark:prose-invert max-w-none font-body text-foreground/90 leading-relaxed space-y-6",
                                 showPaywall && "blur-md select-none line-clamp-5"
                             )}
-                            dangerouslySetInnerHTML={{ __html: story.content.replace(/\n/g, '<br />') }}
+                            dangerouslySetInnerHTML={{ __html: storyContent.replace(/\n/g, '<br />') }}
                         />
                     </div>
                 </article>
