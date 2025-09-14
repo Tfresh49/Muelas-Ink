@@ -11,14 +11,14 @@ import { cn } from "@/lib/utils";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { BookText, Loader2, ArrowLeft, Bold, Italic, Underline, Strikethrough, Heading1, Heading2, Heading3, Palette, Highlighter, Link2, Image as ImageIcon, PlusCircle, Eye } from "lucide-react";
 import { addStory } from "@/lib/stories";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import Image from 'next/image';
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +43,7 @@ const storySchema = z.object({
   category: z.string().min(1, "Category is required"),
   tags: z.string().min(1, "Tags are required"),
   seasons: z.array(seasonSchema).min(1, "A story must have at least one season."),
+  coverImageUrl: z.string().url("Must be a valid URL").min(1, "Cover Image URL is required"),
 });
 
 type FormValues = z.infer<typeof storySchema>;
@@ -63,14 +64,26 @@ const EditorToolbar = ({ onFormat }: { onFormat: (type: string) => void }) => (
             <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button"><Highlighter /></Button></TooltipTrigger><TooltipContent><p>Highlight (Not Implemented)</p></TooltipContent></Tooltip>
             <div className="w-px h-6 bg-border mx-2" />
             <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("link")}><Link2 /></Button></TooltipTrigger><TooltipContent><p>Insert Link</p></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button"><ImageIcon /></Button></TooltipTrigger><TooltipContent><p>Upload Image (Not Implemented)</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("image")}><ImageIcon /></Button></TooltipTrigger><TooltipContent><p>Insert Image</p></TooltipContent></Tooltip>
         </div>
     </TooltipProvider>
 );
 
 const StoryPreview = ({ storyData }: { storyData: Partial<FormValues> }) => {
-    const { title, category, tags, seasons } = storyData;
+    const { title, category, tags, seasons, coverImageUrl } = storyData;
     const activeContent = seasons?.[0]?.episodes?.[0]?.content || "Start writing to see your preview...";
+
+    const formattedContent = activeContent
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/<u>(.*?)<\/u>/g, '<u>$1</u>')
+      .replace(/~~(.*?)~~/g, '<del>$1</del>')
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; border-radius: 0.5rem;" />')
+      .replace(/\n/g, '<br />');
 
     return (
         <ScrollArea className="h-full w-full">
@@ -88,7 +101,7 @@ const StoryPreview = ({ storyData }: { storyData: Partial<FormValues> }) => {
                 </header>
                 <div className="relative h-64 md:h-96 w-full rounded-lg overflow-hidden mb-8 shadow-lg bg-secondary">
                     <Image
-                        src="https://picsum.photos/seed/preview/1200/800"
+                        src={coverImageUrl || "https://picsum.photos/seed/preview/1200/800"}
                         alt={title || "Story Preview"}
                         fill
                         className="object-cover"
@@ -97,7 +110,7 @@ const StoryPreview = ({ storyData }: { storyData: Partial<FormValues> }) => {
                 </div>
                  <div
                     className="prose prose-lg dark:prose-invert max-w-none font-body text-foreground/90 leading-relaxed space-y-6"
-                    dangerouslySetInnerHTML={{ __html: activeContent.replace(/\n/g, '<br />') }}
+                    dangerouslySetInnerHTML={{ __html: formattedContent }}
                 />
             </div>
         </ScrollArea>
@@ -120,6 +133,7 @@ export default function NewStoryPage() {
       excerpt: "",
       category: "",
       tags: "",
+      coverImageUrl: "",
       seasons: [{ title: "Season 1", episodes: [{ title: "Episode 1", content: "" }] }],
     },
   });
@@ -175,13 +189,25 @@ export default function NewStoryPage() {
             newCursorPos = start + 4;
             break;
         case "link":
-             markdown = `[${selectedText}](url)`;
-             newCursorPos = start + 1;
+             const linkUrl = prompt("Enter the URL:", "https://");
+             if (linkUrl) {
+                markdown = `[${selectedText || 'link text'}](${linkUrl})`;
+                newCursorPos = start + 1;
+             }
              break;
+        case "image":
+            const imageUrl = prompt("Enter the Image URL:");
+            if(imageUrl) {
+                markdown = `![${selectedText || 'alt text'}](${imageUrl})`;
+                newCursorPos = start + 2;
+            }
+            break;
         default:
             return;
     }
     
+    if (markdown === "") return;
+
     const episodeIndex = parseInt(activeTab);
     const fieldName = `seasons.${activeSeason}.episodes.${episodeIndex}.content`;
     const currentContent = form.getValues(fieldName as any);
@@ -191,7 +217,12 @@ export default function NewStoryPage() {
     
     setTimeout(() => {
         activeTextarea.focus();
-        activeTextarea.setSelectionRange(newCursorPos, newCursorPos + selectedText.length);
+        if (selectedText.length === 0 && (type === 'link' || type === 'image')) {
+            // Move cursor inside the brackets/parentheses
+            activeTextarea.setSelectionRange(newCursorPos, newCursorPos + (type === 'link' ? 9 : 8));
+        } else {
+            activeTextarea.setSelectionRange(newCursorPos, newCursorPos + selectedText.length);
+        }
     }, 0);
   };
 
@@ -199,8 +230,10 @@ export default function NewStoryPage() {
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     try {
+      const { coverImageUrl, ...restOfValues } = values;
       const newStoryData = {
-        ...values,
+        ...restOfValues,
+        imageUrl: coverImageUrl, // Map coverImageUrl to the expected imageUrl field
         tags: values.tags.split(',').map(tag => tag.trim()),
         seasons: values.seasons.map(season => ({
             ...season,
@@ -391,6 +424,23 @@ export default function NewStoryPage() {
                     ))}
                 </Tabs>
             </div>
+            
+            <FormField
+              control={form.control}
+              name="coverImageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cover Image URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://example.com/image.jpg" {...field} />
+                  </FormControl>
+                   <FormDescription>
+                    This is the main image that will appear on the story card listings.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
@@ -426,3 +476,5 @@ export default function NewStoryPage() {
     </Card>
   );
 }
+
+    
