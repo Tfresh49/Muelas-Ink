@@ -6,15 +6,16 @@ import { notFound } from 'next/navigation';
 import StoryCard from '@/components/story-card';
 import AuthorCard from '@/components/author-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Rss, Clapperboard, Mic, Calendar, MapPin, Ticket, PlayCircle, Heart, MessageSquare } from 'lucide-react';
+import { Rss, Clapperboard, Mic, Calendar } from 'lucide-react';
 import ReelCard from '@/components/reel-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { allFeedItems } from '@/lib/feeds-data';
-import AudioPlayer from '@/components/audio-player';
 import { allPodcasts } from '@/lib/podcasts-data';
+import EventItem from '@/components/event-item';
+import FeedItemCard from '@/components/feed-item-card';
+import PodcastItem from '@/components/podcast-item';
 
 interface AuthorPageProps {
   params: {
@@ -29,90 +30,6 @@ const PlaceholderContent = ({ title, icon: Icon }: { title: string, icon: React.
         <p>Check back later for updates from the author!</p>
     </div>
 );
-
-const FeedItemCard = ({ item }: { item: typeof allFeedItems[0] }) => (
-    <Link href={`/feeds/${item.id}`} className="block">
-        <Card className="transition-all hover:shadow-md hover:border-primary/50">
-            <CardHeader className="flex flex-row items-center gap-4">
-                <Image src={item.authorAvatar} alt={item.author} width={40} height={40} className="rounded-full" data-ai-hint="person portrait" />
-                <div>
-                    <p className="font-semibold">{item.author}</p>
-                    <p className="text-xs text-muted-foreground">{item.time}</p>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <p className="mb-4">{item.content}</p>
-                {item.imageUrl && (
-                    <div className="relative aspect-video rounded-lg overflow-hidden">
-                        <Image src={item.imageUrl} alt="Feed image" fill className="object-cover" data-ai-hint="landscape" />
-                    </div>
-                )}
-                 <div className="flex gap-4 text-muted-foreground text-sm mt-4">
-                    <div className="flex items-center gap-1">
-                        <Heart className="h-4 w-4" />
-                        <span>{item.likes}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <MessageSquare className="h-4 w-4" />
-                        <span>{item.commentsCount}</span>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
-    </Link>
-);
-
-const PodcastItem = ({ podcast }: { podcast: typeof allPodcasts[0] }) => (
-    <Link href={`/podcasts/${podcast.id}`} className="block">
-    <Card className="overflow-hidden transition-all hover:shadow-md hover:border-primary/50">
-        <div className="flex flex-col md:flex-row">
-            <div className="relative w-full md:w-1/3 aspect-square">
-                <Image src={podcast.imageUrl} alt={podcast.title} fill className="object-cover" data-ai-hint="podcast cover" />
-                 {podcast.isLive && (
-                    <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1.5 animate-pulse">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                        </span>
-                        LIVE
-                    </div>
-                )}
-            </div>
-            <div className="md:w-2/3 p-6 flex flex-col justify-between">
-                <div>
-                    <h3 className="font-headline text-xl mb-2">{podcast.title}</h3>
-                    <p className="text-muted-foreground mb-4 line-clamp-3">{podcast.description}</p>
-                </div>
-                 <Button variant="link" className="p-0 justify-start">View Episode</Button>
-            </div>
-        </div>
-    </Card>
-    </Link>
-);
-
-const EventItem = ({ event }: { event: typeof allEvents[0] }) => (
-    <Link href={`/events/${event.id}`} className="block">
-        <Card className="flex flex-col md:flex-row transition-all hover:shadow-md hover:border-primary/50">
-            <div className="bg-secondary p-6 flex flex-col items-center justify-center rounded-t-lg md:rounded-l-lg md:rounded-t-none">
-                <span className="font-headline text-4xl text-primary">{event.date.day}</span>
-                <span className="font-semibold">{event.date.month}</span>
-            </div>
-            <div className="p-6 flex-grow">
-                <h3 className="font-headline text-2xl mb-2">{event.title}</h3>
-                <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                    <MapPin className="h-4 w-4" />
-                    <span>{event.location}</span>
-                </div>
-                <p className="text-muted-foreground mb-4">{event.description}</p>
-                <Button>
-                    <Ticket className="mr-2 h-4 w-4" />
-                    View Details
-                </Button>
-            </div>
-        </Card>
-    </Link>
-);
-
 
 export default function AuthorPage({ params }: AuthorPageProps) {
   const author = allAuthors.find(a => a.urlSlug === params.name);
