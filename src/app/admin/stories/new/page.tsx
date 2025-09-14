@@ -60,8 +60,8 @@ const EditorToolbar = ({ onFormat }: { onFormat: (type: string) => void }) => (
             <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("h2")}><Heading2 /></Button></TooltipTrigger><TooltipContent><p>Heading 2</p></TooltipContent></Tooltip>
             <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("h3")}><Heading3 /></Button></TooltipTrigger><TooltipContent><p>Heading 3</p></TooltipContent></Tooltip>
             <div className="w-px h-6 bg-border mx-2" />
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button"><Palette /></Button></TooltipTrigger><TooltipContent><p>Text Color (Not Implemented)</p></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button"><Highlighter /></Button></TooltipTrigger><TooltipContent><p>Highlight (Not Implemented)</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" disabled><Palette /></Button></TooltipTrigger><TooltipContent><p>Text Color (Not Implemented)</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" disabled><Highlighter /></Button></TooltipTrigger><TooltipContent><p>Highlight (Not Implemented)</p></TooltipContent></Tooltip>
             <div className="w-px h-6 bg-border mx-2" />
             <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("link")}><Link2 /></Button></TooltipTrigger><TooltipContent><p>Insert Link</p></TooltipContent></Tooltip>
             <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("image")}><ImageIcon /></Button></TooltipTrigger><TooltipContent><p>Insert Image</p></TooltipContent></Tooltip>
@@ -299,7 +299,7 @@ export default function NewStoryPage() {
                          <Button type="button" variant="outline"><Eye className="mr-2" /> Preview</Button>
                     </SheetTrigger>
                     <SheetContent side="right" className="w-full sm:max-w-2xl p-0">
-                        <SheetHeader className="p-4 border-b">
+                         <SheetHeader className="p-4 border-b">
                            <SheetTitle className="sr-only">Story Preview</SheetTitle>
                         </SheetHeader>
                         <StoryPreview storyData={storyData} />
@@ -476,7 +476,5 @@ export default function NewStoryPage() {
     </Card>
   );
 }
-
-    
 
     
