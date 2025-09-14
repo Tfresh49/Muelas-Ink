@@ -19,9 +19,8 @@ export default function AdminLayout({
   const router = useRouter();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  // For this prototype, we'll just check for a specific user email.
-  // In a real app, you'd have roles or custom claims in Firebase.
-  const isAdmin = user?.email === "admin@muelas.ink";
+  // Use the provided UID for secure admin access check.
+  const isAdmin = user?.uid === "2GrdxGWNt0VEQqCpCDR4e8AcZG03";
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
