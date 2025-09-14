@@ -2,21 +2,23 @@
 "use client";
 
 import { useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import Link from 'next/link';
+import { auth } from '@/lib/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { login } = useAuth();
   const [error, setError] = useState('');
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (password !== confirmPassword) {
@@ -27,9 +29,13 @@ export default function SignupPage() {
       setError('Please fill in all fields.');
       return;
     }
-    // Simulate a successful signup and login
-    console.log('Signing up with:', { email });
-    login('dummy-auth-token');
+    
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      router.push('/profile');
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -49,6 +55,7 @@ export default function SignupPage() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -59,6 +66,7 @@ export default function SignupPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
              <div className="space-y-2">
@@ -69,6 +77,7 @@ export default function SignupPage() {
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
             </div>
             {error && <p className="text-destructive text-sm">{error}</p>}

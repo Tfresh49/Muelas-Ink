@@ -7,9 +7,11 @@ import { useEffect } from 'react';
 import { User, LogOut } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function ProfilePage() {
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -17,6 +19,15 @@ export default function ProfilePage() {
       router.push('/login');
     }
   }, [isAuthenticated, isLoading, router]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    // Also clear reading history for full simulation
+    localStorage.removeItem('hasHadFirstRead');
+    localStorage.removeItem('bookmarkedStories');
+    localStorage.removeItem('likedStories');
+    router.push('/');
+  }
 
   if (isLoading || !isAuthenticated) {
     return (
@@ -35,10 +46,11 @@ export default function ProfilePage() {
                 <CardTitle className="font-headline text-3xl">My Profile</CardTitle>
             </CardHeader>
             <CardContent className="text-center">
-                <p className="text-muted-foreground mb-6">
-                    Welcome, reader! This is your personal profile page.
+                <p className="text-muted-foreground mb-4">
+                    Welcome back!
                 </p>
-                <Button variant="destructive" onClick={logout}>
+                <p className="font-semibold text-lg mb-6 break-words">{user?.email}</p>
+                <Button variant="destructive" onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Log Out
                 </Button>
