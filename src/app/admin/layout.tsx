@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 
 export default function AdminLayout({
@@ -69,6 +69,9 @@ export default function AdminLayout({
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 p-0">
+                    <SheetHeader className="p-4 border-b">
+                        <SheetTitle className="text-lg font-semibold">Admin Menu</SheetTitle>
+                    </SheetHeader>
                     <AdminSidebar onLinkClick={() => setSidebarOpen(false)} />
                 </SheetContent>
             </Sheet>
