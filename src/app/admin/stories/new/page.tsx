@@ -41,23 +41,23 @@ const storySchema = z.object({
 
 type FormValues = z.infer<typeof storySchema>;
 
-const EditorToolbar = () => (
+const EditorToolbar = ({ onFormat }: { onFormat: (type: string) => void }) => (
     <TooltipProvider>
         <div className="flex items-center gap-1 border rounded-md p-2 bg-secondary mb-4">
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Bold /></Button></TooltipTrigger><TooltipContent><p>Bold</p></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Italic /></Button></TooltipTrigger><TooltipContent><p>Italic</p></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Underline /></Button></TooltipTrigger><TooltipContent><p>Underline</p></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Strikethrough /></Button></TooltipTrigger><TooltipContent><p>Strikethrough</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("bold")}><Bold /></Button></TooltipTrigger><TooltipContent><p>Bold</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("italic")}><Italic /></Button></TooltipTrigger><TooltipContent><p>Italic</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("underline")}><Underline /></Button></TooltipTrigger><TooltipContent><p>Underline</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("strike")}><Strikethrough /></Button></TooltipTrigger><TooltipContent><p>Strikethrough</p></TooltipContent></Tooltip>
             <div className="w-px h-6 bg-border mx-2" />
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Heading1 /></Button></TooltipTrigger><TooltipContent><p>Heading 1</p></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Heading2 /></Button></TooltipTrigger><TooltipContent><p>Heading 2</p></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Heading3 /></Button></TooltipTrigger><TooltipContent><p>Heading 3</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("h1")}><Heading1 /></Button></TooltipTrigger><TooltipContent><p>Heading 1</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("h2")}><Heading2 /></Button></TooltipTrigger><TooltipContent><p>Heading 2</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("h3")}><Heading3 /></Button></TooltipTrigger><TooltipContent><p>Heading 3</p></TooltipContent></Tooltip>
             <div className="w-px h-6 bg-border mx-2" />
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Palette /></Button></TooltipTrigger><TooltipContent><p>Text Color</p></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Highlighter /></Button></TooltipTrigger><TooltipContent><p>Highlight</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button"><Palette /></Button></TooltipTrigger><TooltipContent><p>Text Color (Not Implemented)</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button"><Highlighter /></Button></TooltipTrigger><TooltipContent><p>Highlight (Not Implemented)</p></TooltipContent></Tooltip>
             <div className="w-px h-6 bg-border mx-2" />
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><Link2 /></Button></TooltipTrigger><TooltipContent><p>Insert Link</p></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon"><ImageIcon /></Button></TooltipTrigger><TooltipContent><p>Upload Image</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button" onClick={() => onFormat("link")}><Link2 /></Button></TooltipTrigger><TooltipContent><p>Insert Link</p></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant="outline" size="icon" type="button"><ImageIcon /></Button></TooltipTrigger><TooltipContent><p>Upload Image (Not Implemented)</p></TooltipContent></Tooltip>
         </div>
     </TooltipProvider>
 );
@@ -68,6 +68,8 @@ export default function NewStoryPage() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeSeason, setActiveSeason] = useState(0);
+  const [activeTab, setActiveTab] = useState("0");
+  const [activeTextarea, setActiveTextarea] = useState<HTMLTextAreaElement | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(storySchema),
@@ -80,15 +82,75 @@ export default function NewStoryPage() {
     },
   });
 
-  const { fields: seasons, append: appendSeason } = useFieldArray({
+  const { fields: seasons, append: appendSeason, remove: removeSeason } = useFieldArray({
     control: form.control,
     name: "seasons",
   });
-
-  const { fields: episodes, append: appendEpisode } = useFieldArray({
+  
+  const { fields: episodes, append: appendEpisode, remove: removeEpisode } = useFieldArray({
     control: form.control,
     name: `seasons.${activeSeason}.episodes`,
   });
+
+  const handleFormat = (type: string) => {
+    if (!activeTextarea) return;
+
+    const start = activeTextarea.selectionStart;
+    const end = activeTextarea.selectionEnd;
+    const selectedText = activeTextarea.value.substring(start, end);
+    let markdown = "";
+    let newCursorPos = start;
+
+    switch (type) {
+        case "bold":
+            markdown = `**${selectedText}**`;
+            newCursorPos = start + 2;
+            break;
+        case "italic":
+            markdown = `*${selectedText}*`;
+            newCursorPos = start + 1;
+            break;
+        case "underline": // Note: No standard markdown, using HTML as example
+             markdown = `<u>${selectedText}</u>`;
+             newCursorPos = start + 3;
+             break;
+        case "strike":
+            markdown = `~~${selectedText}~~`;
+            newCursorPos = start + 2;
+            break;
+        case "h1":
+            markdown = `# ${selectedText}`;
+            newCursorPos = start + 2;
+            break;
+        case "h2":
+            markdown = `## ${selectedText}`;
+            newCursorPos = start + 3;
+            break;
+        case "h3":
+            markdown = `### ${selectedText}`;
+            newCursorPos = start + 4;
+            break;
+        case "link":
+             markdown = `[${selectedText}](url)`;
+             newCursorPos = start + 1;
+             break;
+        default:
+            return;
+    }
+    
+    const episodeIndex = parseInt(activeTab);
+    const fieldName = `seasons.${activeSeason}.episodes.${episodeIndex}.content`;
+    const currentContent = form.getValues(fieldName as any);
+    const newContent = currentContent.substring(0, start) + markdown + currentContent.substring(end);
+    
+    form.setValue(fieldName as any, newContent, { shouldDirty: true });
+    
+    setTimeout(() => {
+        activeTextarea.focus();
+        activeTextarea.setSelectionRange(newCursorPos, newCursorPos + selectedText.length);
+    }, 0);
+  };
+
 
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
@@ -102,7 +164,7 @@ export default function NewStoryPage() {
             id: crypto.randomUUID(),
         })),
       };
-      await addStory(newStoryData as any); // Type assertion needed due to evolving type
+      await addStory(newStoryData as any);
       toast({
         title: "Success!",
         description: "Your story has been created.",
@@ -123,11 +185,18 @@ export default function NewStoryPage() {
   const addSeason = () => {
     appendSeason({ title: `Season ${seasons.length + 1}`, episodes: [{ title: "Episode 1", content: "" }] });
     setActiveSeason(seasons.length);
+    setActiveTab("0");
   };
   
   const addEpisode = () => {
     const currentSeason = form.getValues(`seasons.${activeSeason}`);
-    appendEpisode({ title: `Episode ${currentSeason.episodes.length + 1}`, content: "" });
+    if(currentSeason.episodes) {
+        appendEpisode({ title: `Episode ${currentSeason.episodes.length + 1}`, content: "" });
+        setActiveTab(String(currentSeason.episodes.length));
+    } else {
+        appendEpisode({ title: 'Episode 1', content: '' });
+        setActiveTab('0');
+    }
   };
 
 
@@ -135,9 +204,11 @@ export default function NewStoryPage() {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-4">
-          <Link href="/admin/stories">
-              <ArrowLeft className="h-6 w-6" />
-          </Link>
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/admin/stories">
+                <ArrowLeft />
+            </Link>
+          </Button>
           <BookText className="h-8 w-8 text-primary" />
           <div>
             <CardTitle className="font-headline text-2xl">Create New Story</CardTitle>
@@ -177,12 +248,13 @@ export default function NewStoryPage() {
             
             <div className="border p-4 rounded-lg space-y-4">
                 <h3 className="font-headline text-lg">Content Editor</h3>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     {seasons.map((season, index) => (
                         <Button 
                             key={season.id} 
+                            type="button"
                             variant={activeSeason === index ? 'default' : 'outline'}
-                            onClick={() => setActiveSeason(index)}
+                            onClick={() => { setActiveSeason(index); setActiveTab("0"); }}
                         >
                             {form.watch(`seasons.${index}.title`)}
                         </Button>
@@ -204,8 +276,8 @@ export default function NewStoryPage() {
                     )}
                  />
 
-                <Tabs defaultValue="0" className="w-full">
-                    <div className="flex items-center gap-2">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <div className="flex items-center gap-2 flex-wrap">
                         <TabsList>
                             {episodes.map((episode, index) => (
                                 <TabsTrigger key={episode.id} value={String(index)}>
@@ -217,7 +289,7 @@ export default function NewStoryPage() {
                     </div>
 
                     {episodes.map((episode, index) => (
-                       <TabsContent key={episode.id} value={String(index)}>
+                       <TabsContent key={episode.id} value={String(index)} forceMount={true} className={cn(activeTab !== String(index) && "hidden")}>
                            <div className="space-y-4 pt-4">
                                 <FormField
                                     control={form.control}
@@ -238,9 +310,13 @@ export default function NewStoryPage() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Episode Content</FormLabel>
-                                            <EditorToolbar />
+                                            <EditorToolbar onFormat={handleFormat} />
                                             <FormControl>
-                                                <Textarea {...field} rows={15} />
+                                                <Textarea 
+                                                    {...field}
+                                                    rows={15} 
+                                                    onFocus={(e) => setActiveTextarea(e.target)}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -293,3 +369,5 @@ export default function NewStoryPage() {
     </Card>
   );
 }
+
+    
