@@ -14,19 +14,25 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { BookText, Loader2, ArrowLeft, Bold, Italic, Underline, Strikethrough, Heading1, Heading2, Heading3, Palette, Highlighter, Link2, Image as ImageIcon, PlusCircle } from "lucide-react";
+import { BookText, Loader2, ArrowLeft, Bold, Italic, Underline, Strikethrough, Heading1, Heading2, Heading3, Palette, Highlighter, Link2, Image as ImageIcon, PlusCircle, Eye } from "lucide-react";
 import { addStory } from "@/lib/stories";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import Image from 'next/image';
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 const episodeSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Episode title is required"),
   content: z.string().min(1, "Episode content is required"),
 });
 
 const seasonSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Season title is required"),
   episodes: z.array(episodeSchema).min(1, "A season must have at least one episode."),
 });
@@ -62,6 +68,42 @@ const EditorToolbar = ({ onFormat }: { onFormat: (type: string) => void }) => (
     </TooltipProvider>
 );
 
+const StoryPreview = ({ storyData }: { storyData: Partial<FormValues> }) => {
+    const { title, category, tags, seasons } = storyData;
+    const activeContent = seasons?.[0]?.episodes?.[0]?.content || "Start writing to see your preview...";
+
+    return (
+        <ScrollArea className="h-full w-full">
+            <div className="p-8">
+                <header className="mb-8">
+                    <div className="flex gap-2 mb-4">
+                        {category && <Badge variant="outline" className="border-accent text-accent">{category}</Badge>}
+                        {tags?.split(',').map(tag => (
+                            <Badge key={tag} variant="secondary">{tag.trim()}</Badge>
+                        ))}
+                    </div>
+                    <h1 className="font-headline text-4xl md:text-5xl font-extrabold mb-2 leading-tight">
+                        {title || "Your Story Title"}
+                    </h1>
+                </header>
+                <div className="relative h-64 md:h-96 w-full rounded-lg overflow-hidden mb-8 shadow-lg bg-secondary">
+                    <Image
+                        src="https://picsum.photos/seed/preview/1200/800"
+                        alt={title || "Story Preview"}
+                        fill
+                        className="object-cover"
+                        data-ai-hint="abstract background"
+                    />
+                </div>
+                 <div
+                    className="prose prose-lg dark:prose-invert max-w-none font-body text-foreground/90 leading-relaxed space-y-6"
+                    dangerouslySetInnerHTML={{ __html: activeContent.replace(/\n/g, '<br />') }}
+                />
+            </div>
+        </ScrollArea>
+    );
+};
+
 
 export default function NewStoryPage() {
   const router = useRouter();
@@ -81,6 +123,8 @@ export default function NewStoryPage() {
       seasons: [{ title: "Season 1", episodes: [{ title: "Episode 1", content: "" }] }],
     },
   });
+
+  const storyData = form.watch();
 
   const { fields: seasons, append: appendSeason, remove: removeSeason } = useFieldArray({
     control: form.control,
@@ -110,7 +154,7 @@ export default function NewStoryPage() {
             markdown = `*${selectedText}*`;
             newCursorPos = start + 1;
             break;
-        case "underline": // Note: No standard markdown, using HTML as example
+        case "underline":
              markdown = `<u>${selectedText}</u>`;
              newCursorPos = start + 3;
              break;
@@ -203,22 +247,39 @@ export default function NewStoryPage() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/admin/stories">
-                <ArrowLeft />
-            </Link>
-          </Button>
-          <BookText className="h-8 w-8 text-primary" />
-          <div>
-            <CardTitle className="font-headline text-2xl">Create New Story</CardTitle>
-            <CardDescription>Fill out the details below to publish a new story.</CardDescription>
-          </div>
+        <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+                <Link href="/admin/stories">
+                    <ArrowLeft />
+                </Link>
+            </Button>
+            <BookText className="h-8 w-8 text-primary" />
+            <div>
+                <CardTitle className="font-headline text-2xl">Create New Story</CardTitle>
+                <CardDescription>Fill out the details below to publish a new story.</CardDescription>
+            </div>
+            </div>
+             <div className="flex justify-end gap-4">
+                <Sheet>
+                    <SheetTrigger asChild>
+                         <Button type="button" variant="outline"><Eye className="mr-2" /> Preview</Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-full sm:max-w-2xl p-0">
+                         <StoryPreview storyData={storyData} />
+                    </SheetContent>
+                </Sheet>
+                <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
+                <Button type="submit" form="story-form" disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Publish Story
+                </Button>
+            </div>
         </div>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form id="story-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="title"
@@ -356,18 +417,9 @@ export default function NewStoryPage() {
                     )}
                 />
             </div>
-            <div className="flex justify-end gap-4">
-                <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
-                <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Publish Story
-                </Button>
-            </div>
           </form>
         </Form>
       </CardContent>
     </Card>
   );
 }
-
-    

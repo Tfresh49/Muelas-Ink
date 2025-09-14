@@ -18,6 +18,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isHomePage = pathname === '/';
+  const isAdminPage = pathname.startsWith('/admin');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -37,9 +38,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-            <Header onMenuClick={() => setSidebarOpen(true)} />
-            <main className="min-h-screen bg-background pt-16">
+            {!isAdminPage && <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />}
+            {!isAdminPage && <Header onMenuClick={() => setSidebarOpen(true)} />}
+            <main className={!isAdminPage ? "min-h-screen bg-background pt-16" : "min-h-screen bg-background"}>
               {children}
             </main>
             {isHomePage && <Footer />}
