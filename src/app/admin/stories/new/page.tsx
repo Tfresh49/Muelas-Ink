@@ -266,7 +266,10 @@ export default function NewStoryPage() {
                          <Button type="button" variant="outline"><Eye className="mr-2" /> Preview</Button>
                     </SheetTrigger>
                     <SheetContent side="right" className="w-full sm:max-w-2xl p-0">
-                         <StoryPreview storyData={storyData} />
+                        <SheetHeader className="p-4 border-b">
+                           <SheetTitle className="sr-only">Story Preview</SheetTitle>
+                        </SheetHeader>
+                        <StoryPreview storyData={storyData} />
                     </SheetContent>
                 </Sheet>
                 <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
