@@ -18,7 +18,7 @@ import { BookText, Loader2, ArrowLeft, Bold, Italic, Underline, Strikethrough, H
 import { addStory } from "@/lib/stories";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import Image from 'next/image';
 import { Badge } from "@/components/ui/badge";
@@ -476,5 +476,7 @@ export default function NewStoryPage() {
     </Card>
   );
 }
+
+    
 
     
