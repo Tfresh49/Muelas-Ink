@@ -12,7 +12,7 @@ import { useReadingProgress } from '@/hooks/use-reading-progress';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
-import { ArrowLeft, UserCircle, Heart, Eye, Star, Bookmark, Share2, Loader2, Volume2 } from 'lucide-react';
+import { ArrowLeft, UserCircle, Heart, Eye, Star, Bookmark, Share2, Loader2, Volume2, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,7 +21,7 @@ import ReadingProgressBar from '@/components/reading-progress-bar';
 import { useToast } from '@/hooks/use-toast';
 import { generateStoryAudio } from '@/ai/flows/story-audio-flow';
 import AudioPlayer from '@/components/audio-player';
-
+import { useAuth } from '@/hooks/use-auth';
 
 interface StoryViewProps {
   story: Story;
@@ -59,12 +59,23 @@ export default function StoryView({ story }: StoryViewProps) {
     const [audioDataUri, setAudioDataUri] = useState<string | null>(null);
     const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
     const [selectedVoice, setSelectedVoice] = useState(voiceDisplayNames[0]);
+    const [showPaywall, setShowPaywall] = useState(false);
+
     const router = useRouter();
     const { toast } = useToast();
+    const { isAuthenticated } = useAuth();
     
     const getAudioStorageKey = (voice: string) => `audio-${story.id}-${voice}`;
 
     useEffect(() => {
+        const hasHadFirstRead = localStorage.getItem('hasHadFirstRead');
+
+        if (!isAuthenticated && hasHadFirstRead) {
+            setShowPaywall(true);
+        } else {
+            localStorage.setItem('hasHadFirstRead', 'true');
+        }
+
         const history = JSON.parse(localStorage.getItem('readingHistory') || '[]').join(', ');
         if (!history.includes(story.title)) {
             const newHistory = [...history, story.title];
@@ -81,7 +92,6 @@ export default function StoryView({ story }: StoryViewProps) {
             setIsBookmarked(true);
         }
 
-        // Load audio for the currently selected voice
         const storedAudio = localStorage.getItem(getAudioStorageKey(selectedVoice));
         if(storedAudio) {
             setAudioDataUri(storedAudio);
@@ -89,7 +99,7 @@ export default function StoryView({ story }: StoryViewProps) {
             setAudioDataUri(null);
         }
 
-    }, [story.id, story.title, selectedVoice]);
+    }, [story.id, story.title, selectedVoice, isAuthenticated]);
 
     const handleLike = () => {
       const likedStories = JSON.parse(localStorage.getItem('likedStories') || '{}');
@@ -105,6 +115,14 @@ export default function StoryView({ story }: StoryViewProps) {
     };
 
     const handleBookmark = () => {
+        if (!isAuthenticated) {
+            toast({
+                title: "Login Required",
+                description: "Please log in to bookmark stories.",
+                action: <Button onClick={() => router.push('/login')}>Login</Button>
+            });
+            return;
+        }
         const bookmarkedStories = JSON.parse(localStorage.getItem('bookmarkedStories') || '{}');
         if (isBookmarked) {
             delete bookmarkedStories[story.id];
@@ -142,6 +160,14 @@ export default function StoryView({ story }: StoryViewProps) {
     };
     
     const handleListen = async () => {
+        if (showPaywall) {
+             toast({
+                title: "Feature Locked",
+                description: "Please sign up or log in to use the audio feature.",
+                action: <Button onClick={() => router.push('/signup')}>Sign Up</Button>
+            });
+            return;
+        }
         const cachedAudio = localStorage.getItem(getAudioStorageKey(selectedVoice));
         if (cachedAudio) {
             setAudioDataUri(cachedAudio);
@@ -297,12 +323,33 @@ export default function StoryView({ story }: StoryViewProps) {
                         </div>
                     )}
 
-
-                    <div
-                        id="story-content"
-                        className="prose prose-lg dark:prose-invert max-w-none font-body text-foreground/90 leading-relaxed space-y-6"
-                        dangerouslySetInnerHTML={{ __html: story.content.replace(/\n/g, '<br />') }}
-                    />
+                    <div className="relative">
+                        {showPaywall && (
+                             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/90 backdrop-blur-sm rounded-lg p-8 text-center">
+                                <Lock className="h-12 w-12 text-primary mb-4" />
+                                <h2 className="font-headline text-3xl font-bold mb-2">Enjoying the stories?</h2>
+                                <p className="text-muted-foreground mb-6 max-w-sm">
+                                    Sign up for a free account to continue reading, unlock audio for all stories, and bookmark your favorites.
+                                </p>
+                                <div className="flex gap-4">
+                                    <Button size="lg" asChild>
+                                        <Link href="/signup">Create Account</Link>
+                                    </Button>
+                                    <Button size="lg" variant="outline" asChild>
+                                        <Link href="/login">Log In</Link>
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                        <div
+                            id="story-content"
+                            className={cn(
+                                "prose prose-lg dark:prose-invert max-w-none font-body text-foreground/90 leading-relaxed space-y-6",
+                                showPaywall && "blur-md select-none line-clamp-5"
+                            )}
+                            dangerouslySetInnerHTML={{ __html: story.content.replace(/\n/g, '<br />') }}
+                        />
+                    </div>
                 </article>
 
                 <div className="mt-16">

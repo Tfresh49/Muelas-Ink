@@ -9,6 +9,7 @@ import { Footer } from '@/components/footer';
 import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/sidebar';
 import { useState } from 'react';
+import { AuthProvider } from '@/hooks/use-auth';
 
 export default function RootLayout({
   children,
@@ -35,13 +36,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-          <Header onMenuClick={() => setSidebarOpen(true)} />
-          <main className="min-h-screen bg-background pt-16">
-            {children}
-          </main>
-          {isHomePage && <Footer />}
-          <Toaster />
+          <AuthProvider>
+            <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
+            <Header onMenuClick={() => setSidebarOpen(true)} />
+            <main className="min-h-screen bg-background pt-16">
+              {children}
+            </main>
+            {isHomePage && <Footer />}
+            <Toaster />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

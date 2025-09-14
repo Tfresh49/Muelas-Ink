@@ -25,8 +25,13 @@ import {
   Home,
   Info,
   Library,
+  LogIn,
+  LogOut,
   Settings,
+  User,
+  UserPlus,
 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 
 interface SidebarProps {
@@ -43,6 +48,8 @@ const subCategories: Record<string, string[]> = {
 };
 
 export function Sidebar({ open, onOpenChange }: SidebarProps) {
+  const { isAuthenticated, logout } = useAuth();
+  
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full md:w-[400px] sm:max-w-full p-0 flex flex-col">
@@ -111,12 +118,44 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           </Accordion>
 
             <div className="flex flex-col items-start gap-2 mt-6 mb-6">
-                <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
-                    <Link href="/library" className="flex items-center gap-3">
-                        <Library className="h-5 w-5" />
-                        My Library
-                    </Link>
-                </Button>
+                 {isAuthenticated ? (
+                    <>
+                        <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
+                            <Link href="/library" className="flex items-center gap-3">
+                                <Library className="h-5 w-5" />
+                                My Library
+                            </Link>
+                        </Button>
+                        <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
+                            <Link href="/profile" className="flex items-center gap-3">
+                                <User className="h-5 w-5" />
+                                Profile
+                            </Link>
+                        </Button>
+                         <Button variant="link" className="p-0 h-auto text-lg text-foreground" onClick={logout}>
+                           <div className="flex items-center gap-3">
+                                <LogOut className="h-5 w-5" />
+                                Logout
+                           </div>
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
+                            <Link href="/login" className="flex items-center gap-3">
+                                <LogIn className="h-5 w-5" />
+                                Login
+                            </Link>
+                        </Button>
+                        <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
+                            <Link href="/signup" className="flex items-center gap-3">
+                                <UserPlus className="h-5 w-5" />
+                                Sign Up
+                            </Link>
+                        </Button>
+                    </>
+                )}
+                 <hr className="w-full my-2 border-border" />
                 <Button variant="link" className="p-0 h-auto text-lg text-foreground" asChild>
                     <Link href="/about" className="flex items-center gap-3">
                         <Info className="h-5 w-5" />
